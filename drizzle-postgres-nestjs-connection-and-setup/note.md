@@ -231,12 +231,17 @@ This is the **core step** — it creates a NestJS provider that initializes the 
 
 Create `src/database/database.module.ts`:
 
+```bash
+npm install @nestjs/config
+```
+
 ```typescript
 import { Module, Global } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import * as schema from '../../database/drizzle/schema';
+
+import * as schema from '../../database/drizzle/schema';  // only this import is needed to change in this file sine the location of schema can be changed based on the time
 
 // This token is used to inject the Drizzle instance anywhere in the app
 export const DRIZZLE = 'DRIZZLE_CONNECTION';
