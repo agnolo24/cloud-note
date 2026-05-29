@@ -17,8 +17,9 @@
 9. [Auto-Run Migrations on Startup (`main.ts`)](#9-auto-run-migrations-on-startup)
 10. [Generate & Run Migrations](#10-generate--run-migrations)
 11. [Inject Drizzle into Any Service (CRUD Examples)](#11-inject-drizzle-into-any-service)
-12. [Bonus: Zod Validation Pipe](#12-bonus-zod-validation-pipe)
-13. [Quick Reference Cheat Sheet](#13-quick-reference-cheat-sheet)
+12. [Transactions (All-or-Nothing Inserts)](#12-transactions-all-or-nothing-inserts)
+13. [Bonus: Zod Validation Pipe](#13-bonus-zod-validation-pipe)
+14. [Quick Reference Cheat Sheet](#14-quick-reference-cheat-sheet)
 
 ---
 
@@ -212,7 +213,7 @@ export const login = pgTable('login', {
 | `.notNull()`        | Column cannot be null                             |
 | `.unique()`         | Column values must be unique                      |
 | `.default(value)`   | Sets a default value                              |
-| `.references(() => table.column)` | Creates a foreign key              |
+| `.references(() => table.column, {onDelete: 'cascade})` | Creates a foreign key              |
 
 ### Foreign key `onDelete` options:
 
@@ -539,7 +540,148 @@ export class SystemRollsService {
 
 ---
 
-## 12. Bonus: Zod Validation Pipe
+## 12. Transactions (All-or-Nothing Inserts)
+
+When you need to insert data into **multiple related tables**, you should use a **database transaction**.
+A transaction ensures that **either ALL inserts succeed, or NONE of them are saved** (atomic operation).
+
+### Why do you need transactions?
+
+Consider a user registration flow where you insert into both `login` and `user` tables:
+
+```
+Without transaction:
+  ✅ Insert into login  →  saved to DB
+  ❌ Insert into user   →  FAILS (e.g., DB error)
+  Result: orphaned login record with no matching user profile!
+         User can't sign up again ("email already exists") but has no profile.
+
+With transaction:
+  ✅ Insert into login  →  held in transaction (not committed yet)
+  ❌ Insert into user   →  FAILS
+  🔄 ROLLBACK           →  login insert is also undone
+  Result: database is clean, as if nothing happened. User can try again.
+```
+
+### Basic syntax:
+
+```typescript
+const result = await this.db.transaction(async (tx) => {
+    // Use 'tx' (transaction client) instead of 'this.db' for ALL queries inside here
+    const first = await tx.insert(schema.tableA).values({ ... }).returning();
+    const second = await tx.insert(schema.tableB).values({ ... }).returning();
+
+    // Whatever you return here becomes the return value of the transaction
+    return { first: first[0], second: second[0] };
+});
+```
+
+### Key rules:
+
+| Rule | Why |
+| ---- | --- |
+| Use **`tx`** inside the callback, NOT `this.db` | `tx` holds the active transaction context. Using `this.db` runs queries outside the transaction |
+| The callback must be **`async`** | Database operations are asynchronous |
+| If any query **throws an error**, the entire transaction is **rolled back** automatically | This is the whole point — all-or-nothing |
+| The **return value** of the callback becomes the return value of `this.db.transaction()` | Use it to pass inserted data back to the controller |
+
+### Real-world example — User Registration:
+
+This inserts login credentials and user profile atomically:
+
+```typescript
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { DRIZZLE } from 'src/database/database.module';
+import * as schema from '../../database/drizzle/schema';
+import { eq } from 'drizzle-orm';
+
+@Injectable()
+export class CredService {
+    constructor(
+        @Inject(DRIZZLE)
+        private db: NodePgDatabase<typeof schema>
+    ) {}
+
+    async registerUser(body: RegistrationSchema) {
+        // 1. Check if email already exists (outside transaction — read-only)
+        const emailFound = await this.db.query.login.findFirst({
+            where: eq(schema.login.email, body.email)
+        });
+
+        if (emailFound) {
+            throw new BadRequestException({
+                message: 'email already exist'
+            });
+        }
+
+        // 2. Insert into both tables inside a transaction
+        return await this.db.transaction(async (tx) => {
+            // Insert login credentials
+            const loginInsert = await tx.insert(schema.login).values({
+                email: body.email,
+                password: body.password
+            }).returning();
+
+            // Insert user profile (uses the auto-generated login ID)
+            const registrationInsert = await tx.insert(schema.user).values({
+                name: body.name,
+                address: body.address,
+                profile_picture: body.profile_picture,
+                login_id: loginInsert[0].id  // link to the login record
+            }).returning();
+
+            // Return both records to the controller
+            return {
+                login: loginInsert[0],
+                user: registrationInsert[0]
+            };
+        });
+    }
+}
+```
+
+### Step-by-step breakdown:
+
+```
+1. this.db.transaction(async (tx) => { ... })
+   → PostgreSQL runs: BEGIN
+
+2. tx.insert(schema.login).values({ ... }).returning()
+   → PostgreSQL runs: INSERT INTO "login" ... RETURNING *
+   → Data is held in the transaction (not yet committed)
+   → loginInsert = [{ id: 1, email: "...", password: "..." }]
+
+3. tx.insert(schema.user).values({ ..., login_id: loginInsert[0].id })
+   → PostgreSQL runs: INSERT INTO "user" ... RETURNING *
+   → Uses the auto-generated id from step 2
+
+4a. If BOTH succeed:
+    → PostgreSQL runs: COMMIT
+    → Both records are permanently saved
+    → The return value { login, user } is sent back
+
+4b. If ANYTHING fails:
+    → PostgreSQL runs: ROLLBACK
+    → Both inserts are undone — database stays clean
+    → The error is thrown up to NestJS exception handler
+```
+
+> [!IMPORTANT]
+> **Always use `tx` (not `this.db`) inside the transaction callback.**
+> If you accidentally use `this.db` instead of `tx`, those queries run **outside** the transaction
+> and will NOT be rolled back if something fails.
+
+> [!TIP]
+> **When to use transactions:** Any time you are inserting/updating/deleting across **multiple tables**
+> where the data must stay consistent. Common examples:
+> - User registration (login + profile)
+> - Orders (order header + order items)
+> - Transfers (debit one account + credit another)
+
+---
+
+## 13. Bonus: Zod Validation Pipe
 
 This project uses **Zod** (not `class-validator`) for request validation.
 
@@ -622,7 +764,7 @@ export class SystemRollsController {
 
 ---
 
-## 13. Quick Reference Cheat Sheet
+## 14. Quick Reference Cheat Sheet
 
 ### Packages to install:
 
