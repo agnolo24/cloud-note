@@ -704,6 +704,10 @@ export type SystemRollDto = z.infer<typeof systemRollDto>;
 
 ### Create a reusable Zod Validation Pipe:
 
+```bash
+npm i zod
+```
+
 ```typescript
 // src/common/pipes/zod-validation.pipe.ts
 import {
