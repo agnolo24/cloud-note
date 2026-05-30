@@ -127,7 +127,7 @@ DATABASE_URL=postgresql://<username>:<password>@<host>:<port>/<database_name>
 **Example:**
 
 ```env
-DATABASE_URL=postgresql://postgres:agnolo_123@localhost:5432/shope_management
+DATABASE_URL=postgresql://postgres:mypassword_123@localhost:5432/shope_management
 ```
 
 ### Format breakdown:
