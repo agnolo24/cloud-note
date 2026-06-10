@@ -13,3 +13,5 @@ Get:3 https://packages.microsoft.com/repos/code stable/main amd64 Packages [25.2
 sudo apt update
 sudo apt --only-upgrade install code
 ```
+
+When updating if it says "code is already the newest version" and the vsCode is showing the update notification it means Microsoft just pushed the update to their update server, triggering the in-app notification. However, it usually takes anywhere from a few hours to a day for them to sync and build the Linux .deb packages in their apt repository.
