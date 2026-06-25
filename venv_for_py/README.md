@@ -2,6 +2,8 @@
 
 
 
+## for python3.14
+
 ```bash
 pip install --user virtualenv --break-system-packages 
 ```
@@ -19,3 +21,16 @@ source .venv/bin/activate
 ```
 
 The above comment is to activate the venv
+
+
+
+
+# for python3.12
+
+```bash
+sudo apt install python3.12-venv -y
+```
+
+```bash
+python3.12 -m venv .venv
+```
