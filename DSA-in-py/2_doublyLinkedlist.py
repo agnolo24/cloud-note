@@ -1,6 +1,6 @@
 class Node:
     def __init__(self, value):
-        self.prev = None
+        self.prev = None # This is to point to the previous node
         self.data = value
         self.next = None
 
@@ -20,7 +20,7 @@ class LinkedList:
             temp = temp.next
 
         temp.next = newNode
-        newNode.prev = temp
+        newNode.prev = temp # pointing to the previous node
 
     def printLinkedList(self):
         forwardOutput = []
