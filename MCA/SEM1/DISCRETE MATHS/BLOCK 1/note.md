@@ -27,19 +27,26 @@ Examples of Propositions vs. Non-Propositions:
 **Mathematical Propositions and Open Sentences**
 
 Mathematical statements can also be classified as propositions:
+
     - Two plus two equals four. (True)
+    
     - Two plus two equals five. (False)
+    
     - x + y > 0 for x > 0 and y > 0. (True)
+    
     - A set with n elements has 2n subsets. (Out of these four examples, three are true and one—"Two plus two equals five"—is false).
 
 
 The Role of Variables (Open Sentences):
+
     - An algebraic sentence like x + y > 0 is not a proposition on its own because its truth value cannot be determined unless the values of $x$ and $y$ are known (e.g., it is false when $x = 1, y = -2$, but true when $x = 1, y = 0$).
+    
     - However, when specific constraints are added—such as x + y > 0 for x > 0, y > 0—it becomes a valid proposition.
     
     
 **proposition notation**
-    - Propositions are typically denoted using lowercase letters (such as $p$ or $q$).
+    - Propositions are typically denoted using lowercase letters (such as 'p' or 'q').
+    
     - Examples of Notation:
         - p:Ice is always cold.
-        - q: \cos^2 \theta + \sin^2 \theta = 1 \text{ for } \theta \in [0, 2\pi]$
+        - q:cos^2 θ + sin^2 θ  = 1 for θ ∈ [0, 2\pi]
