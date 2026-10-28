@@ -69,7 +69,8 @@ Mathematical statements can also be classified as propositions:
     
     - x + y > 0 for x > 0 and y > 0. (True)
     
-    - A set with n elements has 2n subsets. (Out of these four examples, three are true and one—"Two plus two equals five"—is false).
+    - A set with n elements has 2n subsets. 
+        (Out of these four examples, three are true and one ("Two plus two equals five") is false).
 
 
 The Role of Variables (Open Sentences):
