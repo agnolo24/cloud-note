@@ -1,3 +1,31 @@
+# 1.0 
+
+### INTRODUCTION
+Human reasoning and scientific advancement led to the formal study of logic, which evolved from Aristotle's early Greek philosophy into modern symbolic logic through the mathematical work of Leibniz and George Boole. This text introduces a unit on symbolic logic (or propositional calculus), which provides a mathematical framework to formalise arguments, test their validity, and identify logical fallacies.
+
+Key Unit Sections
+
+• Acceptable Sentences (Sec. 1.2): Introduces "statements" or "propositions," which are sentences that hold a definitive truth value of either True (T) or False (F).
+
+• Propositional Calculus (Sec. 1.3): Explores how simple propositions are linked into complex compound statements using logical connectives ("and", "or", "not", "implies", "implies and is implied by") and explains how to build truth tables for them.
+
+• Statement Equivalence (Sec. 1.4): Examines the specific conditions under which two different statements are logically identical and can be substituted for one another.
+
+• Quantification & Notation (Sec. 1.5): Defines the standard terminology and notations used to quantify objects within a logical statement.
+
+# 1.1
+
+### OBJECTIVES
+After reading this unit, you should be able to:
+
+- distinguish between propositions and non-propositions;
+
+- construct the truth table of any compound proposition;
+
+- identify and use logically equivalent statements;
+
+- identify and use logical quantifiers.
+
 # 1.2
 
 ### PROPOSITIONS
