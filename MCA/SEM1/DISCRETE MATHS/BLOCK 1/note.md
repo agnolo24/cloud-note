@@ -1,6 +1,6 @@
 # 1.2
 
-### Proposition
+### PROPOSITIONS
 **In mathematical logic, a proposition (or statement) is a declarative sentence that is uniformly true or uniformly false (never both), and whose truth value is universally agreed upon by everyone.**
 
 To be accepted as a proposition, a sentence must meet two main conditions:
@@ -59,3 +59,21 @@ The Role of Variables (Open Sentences):
             - The truth value of “Ice melts at 30°C.” is F (False).
             - The truth value of “x^2 >= 0 for x ∈ R” is T (True).  
         
+---
+
+
+# 1.3 
+
+### LOGICAL CONNECTIVES
+***Logical connectives are words and phrases used to combine simpler statements into more complex ones in mathematical logic.***
+
+Examples: 'and', 'or', 'if ... then', 'if and only if'.
+
+There are 6 logical connections in total, but hear we only have 5 to learn, they are:
+```
+- Disjunction
+- Conjection
+- Negation
+- Conditional Connection
+- Precedence Rule
+```
