@@ -40,16 +40,23 @@ To be accepted as a proposition, a sentence must meet two main conditions:
 ```
 
 Examples of Propositions vs. Non-Propositions:
+
     - Valid Propositions (General):
         - “In 2003, the President of India was a woman.” (Universally false)
+        
         - “An elephant weighs more than a human being.” (Universally true)
+        
         - “An egg has protein in it.” (Universally true)
+        
         - “The Prime Minister of India has to be a man.” (Universally false)
         
     - Invalid Propositions (Subjective or Non-Declarative):
         - “Women are more intelligent than men.” (Rejected because people disagree; not universally true or false)
+        
         - “Watch the film.” (Rejected because it is an order)
+        
         - “How wonderful!” (Rejected because it is an exclamation)
+        
         - “What did you say?” (Rejected because it is a question)
         
 **Mathematical Propositions and Open Sentences**
@@ -77,6 +84,7 @@ The Role of Variables (Open Sentences):
     
     - Examples of Notation:
         - p:Ice is always cold.
+        
         - q:cos^2 θ + sin^2 θ  = 1 for θ ∈ [0, 2π]
         
 **Truth Values (T and F)**
@@ -85,6 +93,7 @@ The Role of Variables (Open Sentences):
       
       - Examples: 
             - The truth value of “Ice melts at 30°C.” is F (False).
+            
             - The truth value of “x^2 >= 0 for x ∈ R” is T (True).  
         
 ---
@@ -100,8 +109,12 @@ Examples: 'and', 'or', 'if ... then', 'if and only if'.
 There are 6 logical connections in total, but hear we only have 5 to learn, they are:
 ```
 - Disjunction
+
 - Conjection
+
 - Negation
+
 - Conditional Connection
+
 - Precedence Rule
 ```
