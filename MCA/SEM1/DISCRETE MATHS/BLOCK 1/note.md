@@ -49,4 +49,13 @@ The Role of Variables (Open Sentences):
     
     - Examples of Notation:
         - p:Ice is always cold.
-        - q:cos^2 θ + sin^2 θ  = 1 for θ ∈ [0, 2\pi]
+        - q:cos^2 θ + sin^2 θ  = 1 for θ ∈ [0, 2π]
+        
+**Truth Values (T and F)**
+
+      - Every proposition has a definitive truth value that is either True (T) or False (F), but never both.
+      
+      - Examples: 
+            - The truth value of “Ice melts at 30°C.” is F (False).
+            - The truth value of “x^2 >= 0 for x ∈ R” is T (True).  
+        
