@@ -120,6 +120,8 @@ There are 6 logical connections in total, but hear we only have 5 to learn, they
 - Precedence Rule
 ```
 
+[**INFO**: A compound statement is a complex statement formed by combining two or more simpler propositions using logical connectives (such as and, or, if...then, etc.).]
+
 #### 1. Disjunction ($\lor, \oplus$)
 A compound statement formed by connecting propositions with "or".
 * **Inclusive Disjunction ($p \lor q$):** True if **at least one** proposition is true (or both).
