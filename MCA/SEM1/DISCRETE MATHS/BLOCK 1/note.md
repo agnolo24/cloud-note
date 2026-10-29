@@ -262,7 +262,7 @@ When evaluating formulas without brackets, connectives are applied in the follow
 **B. Universal Quantifier ($\forall$)**
 * **Meaning:** "For all", "For every", or "For each".
 * **Symbol:** $\forall$
-* *Example:* $(\forall x \in \mathbb{N})(x^2 > x)$ means *"For every x in $\mathbb{N}$, $x^2 > x$"* (False, since it fails for x = 1).
+* *Example:* $(\forall x \in \mathbb{N})(x^2 > x)$ means *"For every x in N, x^2 > x"* (False, since it fails for x = 1).
 
 **C. Uniqueness Quantifier ($\exists!$)**
 * **Meaning:** "There is one and only one", "There is a unique", or "There is exactly one".
