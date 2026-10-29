@@ -180,7 +180,7 @@ Reverses the truth value of a proposition.
     | F | T | T |
     | F | F | T |
 * **Converse:** Flipping $p \rightarrow q$ to $q \rightarrow p$.
-* **Biconditional ($p \leftrightarrow q$):** "$p$ if and only if $q$" (iff). Equivalent to $(p \rightarrow q) \land (q \rightarrow p)$.
+* **Biconditional ($p \leftrightarrow q$):** "p if and only if $q$" (iff). Equivalent to $(p \rightarrow q) \land (q \rightarrow p)$.
   * *Rule:* True when both propositions have the **same** truth value.
   * *Truth Table:*
     | $p$ | $q$ | $p \leftrightarrow q$ |
