@@ -198,3 +198,40 @@ When evaluating formulas without brackets, connectives are applied in the follow
 2. **$\land$** (Conjunction)
 3. **$\lor$ and $\oplus$** (Inclusive/Exclusive Disjunction) — *(Left-most first if both appear)*
 4. **$\rightarrow$ and $\leftrightarrow$** (Conditional & Biconditional) — *Lowest*
+
+# 1.4 
+### Logical Equivalence, Tautologies, and Contradictions
+
+#### 1. Logical Equivalence ($\equiv$)
+* **Definition:** Two propositions $r$ and $s$ are **logically equivalent** ($r \equiv s$) if they share the exact same truth value for every possible combination of truth values.
+* **Example (Contrapositive):** 
+  $$(p \rightarrow q) \equiv (\sim q \rightarrow \sim p)$$
+
+---
+
+#### 2. Essential Laws of Logical Equivalence
+* **Double Negation Law:** 
+  $$\sim (\sim p) \equiv p$$
+* **De Morgan’s Laws:**
+  * $\sim (p \lor q) \equiv \sim p \land \sim q$
+  * $\sim (p \land q) \equiv \sim p \lor \sim q$
+* **Idempotent Laws:** 
+  * $p \land p \equiv p$
+  * $p \lor p \equiv p$
+* **Commutative Laws:** 
+  * $p \lor q \equiv q \lor p$
+  * $p \land q \equiv q \land p$
+* **Associative Laws:** 
+  * $(p \lor q) \lor r \equiv p \lor (q \lor r)$
+  * $(p \land q) \land r \equiv p \land (q \land r)$
+* **Distributive Laws:** 
+  * $p \lor (q \land r) \equiv (p \lor q) \land (p \lor r)$
+  * $p \land (q \lor r) \equiv (p \land q) \lor (p \lor r)$
+
+---
+
+#### 3. Tautology and Contradiction
+* **Tautology ($T$):** A compound proposition that is **always true** for all possible truth values.
+  * *Example:* $(p \rightarrow q) \leftrightarrow (\sim p \lor q)$ is a tautology because its final truth column is entirely True ($\text{T}$).
+* **Contradiction ($F$):** A compound proposition that is **always false** for all possible truth values.
+  * *Example:* $p \land q \land \sim p$ is a contradiction because $p$ and $\sim p$ can never both be true at the same time.
