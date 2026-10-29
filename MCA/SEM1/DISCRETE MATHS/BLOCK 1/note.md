@@ -257,7 +257,7 @@ When evaluating formulas without brackets, connectives are applied in the follow
 **A. Existential Quantifier ($\exists$)**
 * **Meaning:** "There exists", "There is at least one", or "For some".
 * **Symbol:** $\exists$
-* *Example:* $(\exists x \in \mathbb{R})(x + 1 > 0)$ means *"There exists an $x$ in $\mathbb{R}$ for which $x + 1 > 0$"* (True).
+* *Example:* $(\exists x \in \mathbb{R})(x + 1 > 0)$ means *"There exists an x in R for which $x + 1 > 0$"* (True).
 
 **B. Universal Quantifier ($\forall$)**
 * **Meaning:** "For all", "For every", or "For each".
