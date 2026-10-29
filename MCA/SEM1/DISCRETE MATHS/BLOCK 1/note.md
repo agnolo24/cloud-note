@@ -248,7 +248,7 @@ When evaluating formulas without brackets, connectives are applied in the follow
 
 #### 1. Propositional Functions (Predicates)
 * **Definition:** A **propositional function** (or **predicate**) in a variable $x$ is a sentence $p(x)$ involving $x$ that becomes a proposition when $x$ is assigned a definite value from its domain (the **universe of discourse**).
-* *Example:* If $p(x)$ is "$x > 5$", $p(6)$ is **True** ($\text{T}$), and $p(0)$ is **False** ($\text{F}$).
+* *Example:* If $p(x)$ is "x > 5", $p(6)$ is **True** ($\text{T}$), and $p(0)$ is **False** ($\text{F}$).
 
 ---
 
