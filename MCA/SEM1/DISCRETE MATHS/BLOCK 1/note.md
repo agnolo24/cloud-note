@@ -239,3 +239,42 @@ When evaluating formulas without brackets, connectives are applied in the follow
   * *Example:* $(p \rightarrow q) \leftrightarrow (\sim p \lor q)$ is a tautology because its final truth column is entirely True ($\text{T}$).
 * **Contradiction ($F$):** A compound proposition that is **always false** for all possible truth values.
   * *Example:* $p \land q \land \sim p$ is a contradiction because $p$ and $\sim p$ can never both be true at the same time.
+
+
+ ---
+ # 1.5 
+
+### Logical Quantifiers
+
+#### 1. Propositional Functions (Predicates)
+* **Definition:** A **propositional function** (or **predicate**) in a variable $x$ is a sentence $p(x)$ involving $x$ that becomes a proposition when $x$ is assigned a definite value from its domain (the **universe of discourse**).
+* *Example:* If $p(x)$ is "$x > 5$", $p(6)$ is **True** ($\text{T}$), and $p(0)$ is **False** ($\text{F}$).
+
+---
+
+#### 2. Types of Quantifiers
+
+**A. Existential Quantifier ($\exists$)**
+* **Meaning:** "There exists", "There is at least one", or "For some".
+* **Symbol:** $\exists$
+* *Example:* $(\exists x \in \mathbb{R})(x + 1 > 0)$ means *"There exists an $x$ in $\mathbb{R}$ for which $x + 1 > 0$"* (True).
+
+**B. Universal Quantifier ($\forall$)**
+* **Meaning:** "For all", "For every", or "For each".
+* **Symbol:** $\forall$
+* *Example:* $(\forall x \in \mathbb{N})(x^2 > x)$ means *"For every $x$ in $\mathbb{N}$, $x^2 > x$"* (False, since it fails for $x = 1$).
+
+**C. Uniqueness Quantifier ($\exists!$)**
+* **Meaning:** "There is one and only one", "There is a unique", or "There is exactly one".
+* **Symbol:** $\exists!$
+* *Example:* $(\exists! x \in A)(x \text{ fits the desk's lock})$ means there is a unique key in set $A$ that fits the lock.
+
+---
+
+#### 3. Rules for Negating Quantified Statements
+When taking the negation of a quantified statement, the quantifier flips:
+
+* $\sim (\forall x \in U) p(x) \equiv (\exists x \in U) (\sim p(x))$
+* $\sim (\exists x \in U) p(x) \equiv (\forall x \in U) (\sim p(x))$
+
+* *Example:* The negation of *"For all criminals, there is a crime they committed"* becomes *"There is a criminal who has not committed every crime"*.
