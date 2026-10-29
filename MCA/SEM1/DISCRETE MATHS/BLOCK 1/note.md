@@ -120,7 +120,7 @@ There are 6 logical connections in total, but hear we only have 5 to learn, they
 - Precedence Rule
 ```
 
-[**Info**: A compound statement is a complex statement formed by combining two or more simpler propositions using logical connectives (such as and, or, if...then, etc.).]
+[[ **Info**: A compound statement is a complex statement formed by combining two or more simpler propositions using logical connectives (such as and, or, if...then, etc.). ]]
 
 #### 1. Disjunction ($\lor, \oplus$)
 A compound statement formed by connecting propositions with "or".
@@ -180,7 +180,7 @@ Reverses the truth value of a proposition.
     | F | T | T |
     | F | F | T |
 * **Converse:** Flipping $p \rightarrow q$ to $q \rightarrow p$.
-* **Biconditional ($p \leftrightarrow q$):** "$p$ if and only if $q$" (iff). Equivalent to $(p \rightarrow q) \land (q \rightarrow p)$.
+* **Biconditional (p <-> q):** "p if and only if q" (iff). Equivalent to (p -> q) \land (q -> p).
   * *Rule:* True when both propositions have the **same** truth value.
   * *Truth Table:*
     | $p$ | $q$ | $p \leftrightarrow q$ |
