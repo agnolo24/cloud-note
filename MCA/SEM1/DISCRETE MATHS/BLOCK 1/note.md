@@ -13,6 +13,7 @@ Key Unit Sections
 
 • Quantification & Notation (Sec. 1.5): Defines the standard terminology and notations used to quantify objects within a logical statement.
 
+---
 # 1.1
 
 ### OBJECTIVES
@@ -25,6 +26,8 @@ After reading this unit, you should be able to:
 - identify and use logically equivalent statements;
 
 - identify and use logical quantifiers.
+
+---
 
 # 1.2
 
@@ -199,6 +202,7 @@ When evaluating formulas without brackets, connectives are applied in the follow
 3. **$\lor$ and $\oplus$** (Inclusive/Exclusive Disjunction) — *(Left-most first if both appear)*
 4. **$\rightarrow$ and $\leftrightarrow$** (Conditional & Biconditional) — *Lowest*
 
+---
 # 1.4 
 ### Logical Equivalence, Tautologies, and Contradictions
 
