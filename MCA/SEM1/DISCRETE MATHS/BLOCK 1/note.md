@@ -120,4 +120,79 @@ There are 6 logical connections in total, but hear we only have 5 to learn, they
 - Precedence Rule
 ```
 
-hello
+#### 1. Disjunction ($\lor, \oplus$)
+A compound statement formed by connecting propositions with "or".
+* **Inclusive Disjunction ($p \lor q$):** True if **at least one** proposition is true (or both).
+  * *Truth Table:*
+    | $p$ | $q$ | $p \lor q$ |
+    | :---: | :---: | :---: |
+    | T | T | T |
+    | T | F | T |
+    | F | T | T |
+    | F | F | F |
+* **Exclusive Disjunction ($p \oplus q$):** "Either $p$ or $q$, but not both." True only when **one** is true and the other is false.
+  * *Truth Table:*
+    | $p$ | $q$ | $p \oplus q$ |
+    | :---: | :---: | :---: |
+    | T | T | F |
+    | T | F | T |
+    | F | T | T |
+    | F | F | F |
+
+---
+
+#### 2. Conjunction ($\land$)
+A compound statement formed by connecting propositions with "and" ($p \land q$).
+* **Rule:** True **only when both** $p$ and $q$ are true.
+* *Truth Table:*
+  | $p$ | $q$ | $p \land q$ |
+  | :---: | :---: | :---: |
+  | T | T | T |
+  | T | F | F |
+  | F | T | F |
+  | F | F | F |
+
+---
+
+#### 3. Negation ($\sim$ or $\neg$)
+Reverses the truth value of a proposition.
+* **Notation:** $\sim p$ (Read as "not $p$").
+* **Rule:** If $p$ is True, $\sim p$ is False; if $p$ is False, $\sim p$ is True.
+* *Truth Table:*
+  | $p$ | $\sim p$ |
+  | :---: | :---: |
+  | T | F |
+  | F | T |
+
+---
+
+#### 4. Conditional Connections
+* **Implication / Conditional ($p \rightarrow q$):** "If $p$, then $q$."
+  * $p$ = Hypothesis, $q$ = Conclusion.
+  * *Rule:* False **only** when a True hypothesis leads to a False conclusion ($\text{T} \rightarrow \text{F} = \text{F}$). Otherwise True.
+  * *Truth Table:*
+    | $p$ | $q$ | $p \rightarrow q$ |
+    | :---: | :---: | :---: |
+    | T | T | T |
+    | T | F | F |
+    | F | T | T |
+    | F | F | T |
+* **Converse:** Flipping $p \rightarrow q$ to $q \rightarrow p$.
+* **Biconditional ($p \leftrightarrow q$):** "$p$ if and only if $q$" (iff). Equivalent to $(p \rightarrow q) \land (q \rightarrow p)$.
+  * *Rule:* True when both propositions have the **same** truth value.
+  * *Truth Table:*
+    | $p$ | $q$ | $p \leftrightarrow q$ |
+    | :---: | :---: | :---: |
+    | T | T | T |
+    | T | F | F |
+    | F | T | F |
+    | F | F | T |
+
+---
+
+#### 5. Rule of Precedence (Order of Evaluation)
+When evaluating formulas without brackets, connectives are applied in the following order of preference (highest to lowest):
+1. **$\sim$** (Negation) — *Highest*
+2. **$\land$** (Conjunction)
+3. **$\lor$ and $\oplus$** (Inclusive/Exclusive Disjunction) — *(Left-most first if both appear)*
+4. **$\rightarrow$ and $\leftrightarrow$** (Conditional & Biconditional) — *Lowest*
