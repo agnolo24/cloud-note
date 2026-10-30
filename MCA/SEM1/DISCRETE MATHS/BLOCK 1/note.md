@@ -13,6 +13,7 @@ Key Unit Sections
 
 • Quantification & Notation (Sec. 1.5): Defines the standard terminology and notations used to quantify objects within a logical statement.
 
+---
 # 1.1
 
 ### OBJECTIVES
@@ -25,6 +26,8 @@ After reading this unit, you should be able to:
 - identify and use logically equivalent statements;
 
 - identify and use logical quantifiers.
+
+---
 
 # 1.2
 
@@ -119,3 +122,159 @@ There are 6 logical connections in total, but hear we only have 5 to learn, they
 
 - Precedence Rule
 ```
+
+[[ **Info**: A compound statement is a complex statement formed by combining two or more simpler propositions using logical connectives (such as and, or, if...then, etc.). ]]
+
+#### 1. Disjunction ($\lor, \oplus$)
+A compound statement formed by connecting propositions with "or".
+* **Inclusive Disjunction ($p \lor q$):** True if **at least one** proposition is true (or both).
+  * *Truth Table:*
+    | $p$ | $q$ | $p \lor q$ |
+    | :---: | :---: | :---: |
+    | T | T | T |
+    | T | F | T |
+    | F | T | T |
+    | F | F | F |
+* **Exclusive Disjunction ($p \oplus q$):** "Either $p$ or $q$, but not both." True only when **one** is true and the other is false.
+  * *Truth Table:*
+    | $p$ | $q$ | $p \oplus q$ |
+    | :---: | :---: | :---: |
+    | T | T | F |
+    | T | F | T |
+    | F | T | T |
+    | F | F | F |
+
+---
+
+#### 2. Conjunction ($\land$)
+A compound statement formed by connecting propositions with "and" ($p \land q$).
+* **Rule:** True **only when both** $p$ and $q$ are true.
+* *Truth Table:*
+  | $p$ | $q$ | $p \land q$ |
+  | :---: | :---: | :---: |
+  | T | T | T |
+  | T | F | F |
+  | F | T | F |
+  | F | F | F |
+
+---
+
+#### 3. Negation ($\sim$ or $\neg$)
+Reverses the truth value of a proposition.
+* **Notation:** $\sim p$ (Read as "not $p$").
+* **Rule:** If $p$ is True, $\sim p$ is False; if $p$ is False, $\sim p$ is True.
+* *Truth Table:*
+  | $p$ | $\sim p$ |
+  | :---: | :---: |
+  | T | F |
+  | F | T |
+
+---
+
+#### 4. Conditional Connections
+* **Implication / Conditional ($p \rightarrow q$):** "If $p$, then $q$."
+  * $p$ = Hypothesis, $q$ = Conclusion.
+  * *Rule:* False **only** when a True hypothesis leads to a False conclusion ($\text{T} \rightarrow \text{F} = \text{F}$). Otherwise True.
+  * *Truth Table:*
+    | $p$ | $q$ | $p \rightarrow q$ |
+    | :---: | :---: | :---: |
+    | T | T | T |
+    | T | F | F |
+    | F | T | T |
+    | F | F | T |
+* **Converse:** Flipping $p \rightarrow q$ to $q \rightarrow p$.
+* **Biconditional ($p \leftrightarrow q$):** "p if and only if $q$" (iff). Equivalent to $(p \rightarrow q) \land (q \rightarrow p)$.
+  * *Rule:* True when both propositions have the **same** truth value.
+  * *Truth Table:*
+    | $p$ | $q$ | $p \leftrightarrow q$ |
+    | :---: | :---: | :---: |
+    | T | T | T |
+    | T | F | F |
+    | F | T | F |
+    | F | F | T |
+
+---
+
+#### 5. Rule of Precedence (Order of Evaluation)
+When evaluating formulas without brackets, connectives are applied in the following order of preference (highest to lowest):
+1. **$\sim$** (Negation) — *Highest*
+2. **$\land$** (Conjunction)
+3. **$\lor$ and $\oplus$** (Inclusive/Exclusive Disjunction) — *(Left-most first if both appear)*
+4. **$\rightarrow$ and $\leftrightarrow$** (Conditional & Biconditional) — *Lowest*
+
+---
+# 1.4 
+### Logical Equivalence, Tautologies, and Contradictions
+
+#### 1. Logical Equivalence ($\equiv$)
+* **Definition:** Two propositions $r$ and $s$ are **logically equivalent** ($r \equiv s$) if they share the exact same truth value for every possible combination of truth values.
+* **Example (Contrapositive):** 
+  $$(p \rightarrow q) \equiv (\sim q \rightarrow \sim p)$$
+
+---
+
+#### 2. Essential Laws of Logical Equivalence
+* **Double Negation Law:** 
+  $$\sim (\sim p) \equiv p$$
+* **De Morgan’s Laws:**
+  * $\sim (p \lor q) \equiv \sim p \land \sim q$
+  * $\sim (p \land q) \equiv \sim p \lor \sim q$
+* **Idempotent Laws:** 
+  * $p \land p \equiv p$
+  * $p \lor p \equiv p$
+* **Commutative Laws:** 
+  * $p \lor q \equiv q \lor p$
+  * $p \land q \equiv q \land p$
+* **Associative Laws:** 
+  * $(p \lor q) \lor r \equiv p \lor (q \lor r)$
+  * $(p \land q) \land r \equiv p \land (q \land r)$
+* **Distributive Laws:** 
+  * $p \lor (q \land r) \equiv (p \lor q) \land (p \lor r)$
+  * $p \land (q \lor r) \equiv (p \land q) \lor (p \lor r)$
+
+---
+
+#### 3. Tautology and Contradiction
+* **Tautology ($T$):** A compound proposition that is **always true** for all possible truth values.
+  * *Example:* $(p \rightarrow q) \leftrightarrow (\sim p \lor q)$ is a tautology because its final truth column is entirely True ($\text{T}$).
+* **Contradiction ($F$):** A compound proposition that is **always false** for all possible truth values.
+  * *Example:* $p \land q \land \sim p$ is a contradiction because $p$ and $\sim p$ can never both be true at the same time.
+
+
+ ---
+ # 1.5 
+
+### Logical Quantifiers
+
+#### 1. Propositional Functions (Predicates)
+* **Definition:** A **propositional function** (or **predicate**) in a variable x is a sentence p(x) involving $x$ that becomes a proposition when $x$ is assigned a definite value from its domain (the **universe of discourse**).
+* *Example:* If $p(x)$ is "x > 5", $p(6)$ is **True** ($\text{T}$), and $p(0)$ is **False** ($\text{F}$).
+
+---
+
+#### 2. Types of Quantifiers
+
+**A. Existential Quantifier ($\exists$)**
+* **Meaning:** "There exists", "There is at least one", or "For some".
+* **Symbol:** $\exists$
+* *Example:* $(\exists x \in \mathbb{R})(x + 1 > 0)$ means *"There exists an x in R for which x + 1 > 0"* (True).
+
+**B. Universal Quantifier ($\forall$)**
+* **Meaning:** "For all", "For every", or "For each".
+* **Symbol:** $\forall$
+* *Example:* $(\forall x \in \mathbb{N})(x^2 > x)$ means *"For every x in N, x^2 > x"* (False, since it fails for x = 1).
+
+**C. Uniqueness Quantifier ($\exists!$)**
+* **Meaning:** "There is one and only one", "There is a unique", or "There is exactly one".
+* **Symbol:** $\exists!$
+* *Example:* $(\exists! x \in A)(x \text{ fits the desk's lock})$ means there is a unique key in set $A$ that fits the lock.
+
+---
+
+#### 3. Rules for Negating Quantified Statements
+When taking the negation of a quantified statement, the quantifier flips:
+
+* $\sim (\forall x \in U) p(x) \equiv (\exists x \in U) (\sim p(x))$
+* $\sim (\exists x \in U) p(x) \equiv (\forall x \in U) (\sim p(x))$
+
+* *Example:* The negation of *"For all criminals, there is a crime they committed"* becomes *"There is a criminal who has not committed every crime"*.
