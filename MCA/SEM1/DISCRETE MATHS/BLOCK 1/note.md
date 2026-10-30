@@ -1,4 +1,6 @@
-# 1.0 
+# UNIT 1 PROPOSITIONAL CALCULUS
+
+## 1.0 
 
 ### INTRODUCTION
 Human reasoning and scientific advancement led to the formal study of logic, which evolved from Aristotle's early Greek philosophy into modern symbolic logic through the mathematical work of Leibniz and George Boole. This text introduces a unit on symbolic logic (or propositional calculus), which provides a mathematical framework to formalise arguments, test their validity, and identify logical fallacies.
@@ -14,7 +16,7 @@ Key Unit Sections
 • Quantification & Notation (Sec. 1.5): Defines the standard terminology and notations used to quantify objects within a logical statement.
 
 ---
-# 1.1
+## 1.1
 
 ### OBJECTIVES
 After reading this unit, you should be able to:
@@ -29,7 +31,7 @@ After reading this unit, you should be able to:
 
 ---
 
-# 1.2
+## 1.2
 
 ### PROPOSITIONS
 **In mathematical logic, a proposition (or statement) is a declarative sentence that is uniformly true or uniformly false (never both), and whose truth value is universally agreed upon by everyone.**
@@ -103,7 +105,7 @@ The Role of Variables (Open Sentences):
 ---
 
 
-# 1.3 
+## 1.3 
 
 ### LOGICAL CONNECTIVES
 ***Logical connectives are words and phrases used to combine simpler statements into more complex ones in mathematical logic.***
@@ -203,7 +205,7 @@ When evaluating formulas without brackets, connectives are applied in the follow
 4. **$\rightarrow$ and $\leftrightarrow$** (Conditional & Biconditional) — *Lowest*
 
 ---
-# 1.4 
+## 1.4 
 ### Logical Equivalence, Tautologies, and Contradictions
 
 #### 1. Logical Equivalence ($\equiv$)
@@ -242,7 +244,7 @@ When evaluating formulas without brackets, connectives are applied in the follow
 
 
  ---
- # 1.5 
+ ## 1.5 
 
 ### Logical Quantifiers
 
