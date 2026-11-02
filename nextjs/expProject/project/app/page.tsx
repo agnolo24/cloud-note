@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <div>
-      Hello coder
+      This is the landing page
     </div>
   );
 }
