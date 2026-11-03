@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "../globals.css";
 import {ReactNode} from "react";
 import Link from "next/link";
 
@@ -9,13 +9,11 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: {children: ReactNode}) {return (
-    <html>
-        <body className="bg-black text-white">
+    <div>
         <h1 className="text-2xl">Header</h1>
-        <Link href='about'>about</Link>
+        <Link href='../about'>about</Link>
         {children}
         <h1 className="text-2xl">Footer</h1>
-        </body>
-    </html>
+    </div>
   );
 }
