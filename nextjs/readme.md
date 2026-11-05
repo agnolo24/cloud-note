@@ -1082,3 +1082,505 @@ Create a small local products array and use `notFound()` when the requested prod
 5. Should we deliberately delay real production pages?
 
 ---
+
+# Lesson 4 — Advanced Routing in Next.js
+
+> **Version:** Next.js 16 (App Router)  
+> **Prerequisites:** `page.tsx`, `layout.tsx`, route groups `(main)`, dynamic segments `[id]`, and `loading.tsx`.  
+> **Goal:** Understand catch-all routes, optional catch-all routes, URL search parameters, and how Server and Client Components read them.
+
+---
+
+## 1. Quick Recap: Normal Dynamic Routes `[id]`
+
+A normal dynamic route captures **exactly one** URL segment.
+
+```text
+app/
+└── students/
+    └── [id]/
+        └── page.tsx
+```
+
+| URL | Captured parameter |
+| --- | --- |
+| `/students/10` | `{ id: "10" }` |
+| `/students/25` | `{ id: "25" }` |
+
+```tsx
+// app/students/[id]/page.tsx
+export default async function StudentPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return <h1>Student ID: {id}</h1>;
+}
+```
+
+In Next.js 16, **`params` is a Promise** in a page's props, so use `await params`. Dynamic parameter values from the URL are strings.
+
+**But what if a URL contains more than one varying segment?** That is where catch-all routes are useful.
+
+---
+
+## 2. Catch-All Routes `[...slug]`
+
+A **catch-all route** captures **one or more URL segments** with a single route file.
+
+Imagine a documentation website:
+
+```text
+/docs/nextjs
+/docs/nextjs/routing
+/docs/nextjs/routing/dynamic-routes
+```
+
+### Folder structure
+
+```text
+app/
+└── docs/
+    └── [...slug]/
+        ├── page.tsx
+        └── loading.tsx    # Optional loading UI
+```
+
+The three dots (`...`) mean **capture the remaining path segments**.
+
+### Implementation
+
+**File: `app/docs/[...slug]/page.tsx`**
+
+```tsx
+export default async function DocsPage({
+  params,
+}: {
+  params: Promise<{ slug: string[] }>;
+}) {
+  const { slug } = await params;
+
+  return (
+    <div>
+      <h1>Documentation</h1>
+      <p>Segments: {slug.join(" / ")}</p>
+    </div>
+  );
+}
+```
+
+### How the captured values look
+
+| URL | `slug` value |
+| --- | --- |
+| `/docs/nextjs` | `["nextjs"]` |
+| `/docs/nextjs/routing` | `["nextjs", "routing"]` |
+| `/docs/nextjs/routing/dynamic-routes` | `["nextjs", "routing", "dynamic-routes"]` |
+
+Notice the TypeScript type:
+
+```tsx
+params: Promise<{ slug: string[] }>;
+```
+
+It is an **array of strings** because more than one segment may be captured.
+
+### What does `join()` do?
+
+```ts
+const slug = ["nextjs", "routing", "dynamic-routes"];
+console.log(slug.join(" / "));
+// nextjs / routing / dynamic-routes
+```
+
+`join()` combines the elements of an array into a string, using the supplied separator.
+
+### Important limitation
+
+With a folder named `[...slug]`, `/docs` by itself **does not match** that catch-all page. The route expects **at least one** path segment after `/docs`.
+
+---
+
+## 3. Optional Catch-All Routes `[[...slug]]`
+
+An **optional catch-all route** is similar to `[...slug]`, except it also matches the parent URL with **zero** additional segments.
+
+Replace `[...slug]` with `[[...slug]]`:
+
+```text
+app/
+└── docs/
+    └── [[...slug]]/
+        ├── page.tsx
+        └── loading.tsx
+```
+
+**File: `app/docs/[[...slug]]/page.tsx`**
+
+```tsx
+export default async function DocsPage({
+  params,
+}: {
+  params: Promise<{ slug?: string[] }>;
+}) {
+  const { slug } = await params;
+
+  return (
+    <div>
+      <h1>Documentation</h1>
+      <p>{slug ? slug.join(" / ") : "Documentation Home"}</p>
+    </div>
+  );
+}
+```
+
+| URL | `slug` value | Output |
+| --- | --- | --- |
+| `/docs` | `undefined` | Documentation Home |
+| `/docs/nextjs` | `["nextjs"]` | nextjs |
+| `/docs/nextjs/routing` | `["nextjs", "routing"]` | nextjs / routing |
+
+### Why `slug?: string[]`?
+
+The `?` means the `slug` property is **optional**. When the URL is exactly `/docs`, there may be no `slug` value.
+
+### Important
+
+Use **either** `[...slug]` **or** `[[...slug]]` for this docs example. Do not keep both folders for the same route pattern, because their matching routes overlap.
+
+---
+
+## 4. Comparing `[id]`, `[...slug]`, and `[[...slug]]`
+
+| Folder name | How many segments? | Example | Parameter type |
+| --- | --- | --- | --- |
+| `[id]` | Exactly one | `/students/10` | `string` |
+| `[...slug]` | One or more | `/docs/a/b` | `string[]` |
+| `[[...slug]]` | Zero or more | `/docs`, `/docs/a/b` | `string[] \| undefined` |
+
+**Easy way to remember:**
+
+- `[id]`: I need exactly **one** value.
+- `[...slug]`: I need **at least one**, possibly several.
+- `[[...slug]]`: I can have **none or several**.
+
+**Real-world examples:** Documentation paths, nested product categories, file browsers, and content hierarchies.
+
+### Related concept: `(main)` is not a dynamic route
+
+Recall from Lesson 2:
+
+```text
+app/(main)/page.tsx   -> /
+app/students/[id]/page.tsx -> /students/10
+```
+
+A folder in parentheses is a **route group**; it does not appear in the URL. A folder in square brackets is a **dynamic segment**; it captures a URL value.
+
+---
+
+## 5. Search Parameters (`searchParams`)
+
+Now consider an e-commerce website where users filter or sort products:
+
+```text
+/products?category=electronics&sort=asc
+```
+
+Break it down:
+
+- `/products` — the **pathname** (route).
+- `?` — starts the **query string**.
+- `category=electronics` — a query parameter (key and value).
+- `&` — separates query parameters.
+- `sort=asc` — another query parameter.
+
+**Unlike a dynamic path segment, query parameters do not require folders named after their keys.**
+
+### Step 1 — Create a page
+
+```text
+app/
+└── products/
+    ├── page.tsx
+    └── loading.tsx
+```
+
+**File: `app/products/page.tsx`**
+
+```tsx
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    category?: string;
+    sort?: string;
+  }>;
+}) {
+  const { category = "all", sort = "asc" } =
+    await searchParams;
+
+  return (
+    <div>
+      <h1>Products</h1>
+      <p>Category: {category}</p>
+      <p>Sort: {sort}</p>
+    </div>
+  );
+}
+```
+
+**File: `app/products/loading.tsx`**
+
+```tsx
+export default function Loading() {
+  return <p>Loading products...</p>;
+}
+```
+
+### Test these URLs
+
+| URL | Category output | Sort output |
+| --- | --- | --- |
+| `/products` | all | asc |
+| `/products?category=electronics` | electronics | asc |
+| `/products?category=clothing&sort=desc` | clothing | desc |
+
+### Understanding the default values
+
+```tsx
+const { category = "all", sort = "asc" } =
+  await searchParams;
+```
+
+This resolves the Promise, extracts both properties, and supplies defaults if a property is `undefined`.
+
+**Note:** In Next.js 16, the page's `searchParams` prop is a **Promise**, just like `params`.
+
+### TypeScript detail: repeated query keys
+
+A URL may repeat a key:
+
+```text
+/products?category=books&category=games
+```
+
+In that case, the raw value can be an array. A more general TypeScript shape is:
+
+```tsx
+searchParams: Promise<{
+  [key: string]: string | string[] | undefined;
+}>;
+```
+
+Our simpler example assumes one value per key. For real applications, **validate and normalize** search parameters before relying on them.
+
+---
+
+## 6. Difference Between `params` and `searchParams`
+
+| Feature | `params` | `searchParams` |
+| --- | --- | --- |
+| Where is the value? | In the URL path | In the query string after `?` |
+| Example | `/products/10` | `/products?sort=asc` |
+| Folder pattern | `[id]` | No query-specific folder needed |
+| Common purpose | Identify a resource | Filtering, sorting, searching |
+| Server page access (Next.js 16) | `await params` | `await searchParams` |
+
+### Using both in the same page
+
+URL:
+
+```text
+/products/10?color=red
+```
+
+**File: `app/products/[id]/page.tsx`**
+
+```tsx
+export default async function ProductDetails({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ color?: string }>;
+}) {
+  const { id } = await params;
+  const { color = "default" } = await searchParams;
+
+  return (
+    <div>
+      <h1>Product: {id}</h1>
+      <p>Selected Color: {color}</p>
+    </div>
+  );
+}
+```
+
+The **path** identifies product `10`; the **query string** supplies the selected color `red`.
+
+---
+
+## 7. `useSearchParams()` in Client Components
+
+We've used the `searchParams` prop in **Server Component pages**. What if we need the current query string inside a **Client Component**?
+
+Next.js provides a hook:
+
+```tsx
+import { useSearchParams } from "next/navigation";
+```
+
+### Example: Search viewer
+
+**File: `app/search/SearchViewer.tsx`**
+
+```tsx
+"use client";
+
+import { useSearchParams } from "next/navigation";
+
+export default function SearchViewer() {
+  const searchParams = useSearchParams();
+  const query = searchParams.get("q");
+
+  return (
+    <div>
+      <h1>Search</h1>
+      <p>Searching for: {query ?? "Nothing"}</p>
+    </div>
+  );
+}
+```
+
+**File: `app/search/page.tsx`**
+
+```tsx
+import { Suspense } from "react";
+import SearchViewer from "./SearchViewer";
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<p>Loading search...</p>}>
+      <SearchViewer />
+    </Suspense>
+  );
+}
+```
+
+Open:
+
+```text
+http://localhost:4004/search?q=nextjs
+```
+
+Expected output:
+
+```text
+Search
+Searching for: nextjs
+```
+
+### Why `"use client"`?
+
+`useSearchParams()` is a **Client Component hook**. It reads the query string and can update as navigation changes it.
+
+### Why `<Suspense>`?
+
+A Client Component calling `useSearchParams()` can suspend while a static route is prerendered. The Suspense boundary gives Next.js a fallback and keeps the surrounding page eligible for static rendering. This is especially important for production builds of statically rendered routes.
+
+### `searchParams` versus `useSearchParams()`
+
+| | `searchParams` page prop | `useSearchParams()` hook |
+| --- | --- | --- |
+| Where? | Page Server Component | Client Component |
+| How? | `await searchParams` | `useSearchParams().get("q")` |
+| Needs `"use client"`? | No | Yes |
+| Useful for | Server-side filtering/data fetching | Reactive client-side query display |
+
+---
+
+## 8. What About `loading.tsx` and Suspense?
+
+From Lesson 3, you already know that a route can provide automatic loading UI with `loading.tsx`.
+
+```text
+app/docs/[...slug]/
+├── page.tsx
+└── loading.tsx
+```
+
+```tsx
+// app/docs/[...slug]/loading.tsx
+export default function Loading() {
+  return <p>Loading documentation...</p>;
+}
+```
+
+`loading.tsx` creates a loading boundary for that route segment. This can be useful when the page awaits route parameters or slow server-side data.
+
+By comparison, a manual `<Suspense>` boundary in `app/search/page.tsx` wraps **a specific component**, such as `SearchViewer`.
+
+**Remember:** These are related ideas, but not identical placements of the loading boundary.
+
+---
+
+## 9. Common Mistakes
+
+1. **Using `string` for catch-all `slug`:** `[...slug]` produces `string[]`, not `string`.
+2. **Expecting `[...slug]` to match `/docs`:** Use `[[...slug]]` when the empty path should match.
+3. **Keeping conflicting catch-all patterns:** Do not define overlapping catch-all and optional catch-all routes for the same URLs.
+4. **Confusing `(main)` with `[id]`:** Parentheses are for organizational route groups; square brackets capture dynamic values.
+5. **Reading Next.js 16 page props synchronously:** Use `await params` and `await searchParams` in async Server Component pages.
+6. **Assuming query parameters are always a string:** A repeated query key can produce `string[]`.
+7. **Using `useSearchParams()` in a Server Component:** It is a Client Component hook; put it in a file with `"use client"` and wrap it in Suspense when appropriate.
+8. **Assuming a URL query changes the folder route:** `/products?sort=asc` still uses `app/products/page.tsx`.
+
+---
+
+## 10. Quick Revision
+
+| Concept | Remember |
+| --- | --- |
+| `[id]` | One URL segment (`string`) |
+| `[...slug]` | One or more URL segments (`string[]`) |
+| `[[...slug]]` | Zero or more URL segments (`string[]` or `undefined`) |
+| `params` | Dynamic **path** values, provided asynchronously in Next.js 16 |
+| `searchParams` | **Query-string** values, provided asynchronously in Next.js 16 |
+| `useSearchParams()` | Client Component hook for reading query values |
+| `loading.tsx` | Automatic route-segment loading UI |
+| `<Suspense>` | Fallback boundary around asynchronous/suspending content |
+| `(name)` | Route group — does not appear in the URL |
+
+---
+
+## 11. Coding Exercise — Product Category Browser
+
+Create this structure:
+
+```text
+app/
+└── shop/
+    └── [[...category]]/
+        └── page.tsx
+```
+
+**Requirements:**
+
+1. `/shop` shows `All Products`.
+2. `/shop/electronics` shows the `electronics` category.
+3. `/shop/electronics/mobile` shows both category segments.
+4. `/shop/electronics/mobile?sort=asc` also displays the sort parameter.
+5. Use `await params` and `await searchParams` as in the examples above.
+
+### Self-check questions
+
+1. Why does `[...slug]` return an array rather than a string?
+2. What changes when you add another pair of square brackets: `[[...slug]]`?
+3. Where do query parameters appear in a URL?
+4. How is `params` different from `searchParams`?
+5. Why does `useSearchParams()` require a Client Component?
+6. What purpose does a Suspense boundary serve in the search example?
+
+---
