@@ -1,35 +1,115 @@
-# Next.js
+# Next.js Learning Notebook
 
-## Creation and configuring Nextjs application
-```
+> **Target:** Next.js 16 · App Router · TypeScript · React 19  
+> **Purpose:** Simple explanations, runnable examples, revision tables, and practical exercises.  
+> **Scope:** Lessons 1–6. Every `app/...` path is relative to the Next.js project root unless otherwise stated.
+
+## Table of contents
+
+1. [Lesson 1: Setup and Project Cleanup](#lesson-1-setup-and-project-cleanup)
+2. [Lesson 2: App Router, Pages, Layouts, and Route Groups](#lesson-2-app-router-pages-layouts-and-route-groups)
+3. [Lesson 3: Dynamic Routing and `loading.tsx`](#lesson-3-dynamic-routing-and-loadingtsx)
+4. [Lesson 4: Advanced Routing and Query Parameters](#lesson-4-advanced-routing-and-query-parameters)
+5. [Lesson 5: Server Components vs. Client Components](#lesson-5-server-components-vs-client-components)
+6. [Lesson 6: React Hooks and Event Handling](#lesson-6-react-hooks-and-event-handling)
+
+**Before practicing:** Run all commands from the correct project folder. Code blocks labeled with filenames replace or create the content of those files. A route shown in two different lessons is typically an alternative exercise rather than an instruction to maintain two copies.
+
+---
+
+## Lesson 1: Setup and Project Cleanup
+
+### 1.1 — Create and start a Next.js application
+
+```bash
 npx create-next-app@latest my-app --yes
 cd my-app
 npm run dev
 ```
 
-- **--yes**  skips prompts using saved preferences or defaults. The default setup enables TypeScript, Tailwind CSS, ESLint, App Router, and Turbopack, with import alias @/*, and includes AGENTS.md to guide coding agents to write up-to-date Next.js code.
+Open `http://localhost:3000` in your browser.
 
-- when running the project by default it will run in the port 3000 if we need to change it we need to use
-' -p 4000' in heat 4000 is the new port address the implementation is shown in the given image
-![alt text](image.png)
+- `create-next-app` sets up the starter project and installs dependencies.
+- `--yes` skips setup prompts using saved preferences or recommended defaults. The current recommended setup includes TypeScript, Tailwind CSS, ESLint, the App Router, Turbopack, and the `@/*` import alias; details may change between generator versions.
+- `npm run dev` starts the development server.
 
-## Now let's clean up the default Next.js boilerplate and keep only what we need
-we are going to edit the 'app/global.css', 'app/layout.tsx', 'app/page.tsx', and remove every image in the 'public' 
-folder as given bellow
+**Change the port** (for example, to `4004`):
 
-![img.png](img.png)
+```bash
+npm run dev -- -p 4004
+```
 
-![img_1.png](img_1.png)
+The `--` passes the following option to the Next.js dev script. Visit `http://localhost:4004` for that command.
 
-![img_2.png](img_2.png)
+### 1.2 — Remove only the starter UI
 
-**we are completely removing the given files** 
-![img_3.png](img_3.png)
+The goal is a **minimal learning project**, not to delete essential configuration. Edit `app/globals.css`, `app/layout.tsx`, and `app/page.tsx` (note the filename is **`globals.css`**, plural). Remove unused demo assets from `public/` only if you do not need them.
 
+**File: `app/globals.css`** (when Tailwind CSS is installed)
 
-## Understanding the `app` folder
+```css
+@import "tailwindcss";
 
-A cleaned-up Next.js project may look like this:
+body {
+  margin: 0;
+}
+```
+
+**File: `app/layout.tsx`**
+
+```tsx
+import type { ReactNode } from "react";
+import "./globals.css";
+
+export default function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+**File: `app/page.tsx`**
+
+```tsx
+export default function Home() {
+  return (
+    <main>
+      <h1>Hello Next.js!</h1>
+      <p>My first Next.js application.</p>
+    </main>
+  );
+}
+```
+
+### 1.3 — Which files and folders should you keep?
+
+| File or folder | Action | Reason |
+| --- | --- | --- |
+| `app/` | Keep | App Router pages and layouts |
+| `public/` | Keep | Optional static assets |
+| `package.json` and lockfile | Keep | Scripts and reproducible dependencies |
+| `tsconfig.json`, `next.config.ts` | Keep | Project configuration |
+| `.gitignore`, ESLint config | Keep | Version control and linting |
+| `next-env.d.ts` | Keep | Next.js TypeScript declarations |
+| `node_modules/` | Do not edit manually | Installed packages; can be regenerated with `npm install` |
+| `.next/` | Do not edit manually | Generated build/dev output; can be regenerated |
+| `README.md`, `AGENTS.md` | Review before removing | Documentation or coding-agent instructions; not required for page routing |
+
+**Remember:** A clean project means removing unwanted *starter content*, not deleting required files. The examples below use the `app/` directory; if you chose `src/` during setup, use `src/app/` instead.
+
+---
+
+## Lesson 2: App Router, Pages, Layouts, and Route Groups
+
+### Understanding the `app` folder
+
+A cleaned-up Next.js project may look like this (the following examples are independent exercises, not files you must all create at once):
 
 ```text
 project/
@@ -50,7 +130,7 @@ Unlike a React application using React Router, you do not have to manually confi
 
 ---
 
-## What is `page.tsx`?
+### What is `page.tsx`?
 
 A `page.tsx` file defines the UI shown at a particular URL.
 
@@ -87,7 +167,7 @@ app/page.tsx  ──────>  http://localhost:3000/
 
 ---
 
-## Creating another page
+### Creating another page
 
 Let's create an **About** page.
 
@@ -127,7 +207,7 @@ About Page
 This is my first additional route.
 ```
 
-### How does Next.js create the URL?
+#### How does Next.js create the URL?
 
 Each regular folder within `app` represents a **route segment**. A `page.tsx` file inside that folder defines the page shown at its URL.
 
@@ -143,7 +223,7 @@ Each regular folder within `app` represents a **route segment**. A `page.tsx` fi
 
 ---
 
-## What is `layout.tsx`?
+### What is `layout.tsx`?
 
 Imagine an application with five pages. You want the same navigation bar and footer on every page.
 
@@ -184,7 +264,7 @@ The root layout wraps the app's pages. The header and footer appear around which
 
 **Note:** In the App Router, the root layout must contain `<html>` and `<body>`.
 
-### What is `children`?
+#### What is `children`?
 
 `children` is a standard React prop. It represents the content placed inside a component.
 
@@ -229,7 +309,7 @@ Shared layouts are preserved during client-side navigation between pages using t
 
 ---
 
-## Nested layouts
+### Nested layouts
 
 Suppose you are building an admin dashboard. You want a sidebar on all dashboard pages, but not on public pages.
 
@@ -283,7 +363,241 @@ This means:
 
 ---
 
-## Navigation using `Link`
+### Route Groups — Organizing routes with `()`
+
+So far, we've learned that normal folders inside `app` usually become parts of the URL. **Route Groups** are an exception.
+
+To create a route group, wrap the folder name in parentheses:
+
+```text
+(main)
+(auth)
+(marketing)
+```
+
+**The name inside `()` does NOT appear in the URL.** This lets us organize related pages and give different sections their own layouts without changing their public URLs.
+
+#### 1. Route groups do not change URLs
+
+Consider this structure:
+
+```text
+app/
+├── layout.tsx
+├── (main)/
+│   ├── page.tsx
+│   ├── about/
+│   │   └── page.tsx
+│   └── contact/
+│       └── page.tsx
+└── (auth)/
+    ├── login/
+    │   └── page.tsx
+    └── register/
+        └── page.tsx
+```
+
+| File | URL |
+| --- | --- |
+| `app/(main)/page.tsx` | `/` |
+| `app/(main)/about/page.tsx` | `/about` |
+| `app/(main)/contact/page.tsx` | `/contact` |
+| `app/(auth)/login/page.tsx` | `/login` |
+| `app/(auth)/register/page.tsx` | `/register` |
+
+**Remember:** A route group is for organizing the code. It does not automatically create a page or URL. You still need `page.tsx` to render a page.
+
+#### 2. Using route groups to show different headers and footers
+
+Suppose you want:
+
+- The **Home** and **Blog** pages to show a *Main Header* and *Main Footer*.
+- The **About** and **Company** pages to show an *About Header* and *About Footer*.
+- All pages to share the same document-level root layout.
+
+Use the following structure:
+
+```text
+app/
+├── globals.css
+├── layout.tsx                 # Root: html + body only
+├── (main)/
+│   ├── layout.tsx             # Main Header + Footer
+│   ├── page.tsx               # /
+│   └── blog/
+│       └── page.tsx          # /blog
+└── about/
+    ├── layout.tsx             # About Header + Footer
+    ├── page.tsx               # /about
+    └── company/
+        └── page.tsx          # /about/company
+```
+
+**File: `app/layout.tsx` (shared Root Layout)**
+
+```tsx
+import type { ReactNode } from "react";
+import "./globals.css";
+
+export default function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+The Root Layout has no visible header or footer, but it still wraps **every** route.
+
+**File: `app/(main)/layout.tsx`**
+
+```tsx
+import type { ReactNode } from "react";
+
+export default function MainLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <div>
+      <header>Main Header</header>
+      <main>{children}</main>
+      <footer>Main Footer</footer>
+    </div>
+  );
+}
+```
+
+**File: `app/about/layout.tsx`**
+
+```tsx
+import type { ReactNode } from "react";
+
+export default function AboutLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <div>
+      <header>About Header</header>
+      <main>{children}</main>
+      <footer>About Footer</footer>
+    </div>
+  );
+}
+```
+
+**File: `app/about/company/page.tsx`**
+
+```tsx
+export default function Company() {
+  return <p>This is the Company page.</p>;
+}
+```
+
+When visiting `/about/company`, the layout hierarchy is:
+
+```text
+RootLayout (app/layout.tsx)
+└── AboutLayout (app/about/layout.tsx)
+    └── Company Page (app/about/company/page.tsx)
+```
+
+**Visible result:**
+
+```text
+About Header
+This is the Company page.
+About Footer
+```
+
+The **Main Header** and **Main Footer** are not shown because the About route is **outside** `(main)`. However, the **Root Layout still renders**.
+
+> **Important:** Route groups do not cancel or skip a parent layout. They let us decide which pages share a *group-specific* layout. This approach is usually best when we want one shared Root Layout and different UI for different sections.
+
+#### 3. Can we skip the Root Layout completely?
+
+Not if a shared `app/layout.tsx` exists: every page beneath `app` inherits it. But Next.js does support **multiple independent Root Layouts**.
+
+To use this approach, remove the top-level `app/layout.tsx` and give each top-level section its own root layout:
+
+```text
+app/
+├── globals.css
+├── (main)/
+│   ├── layout.tsx             # Main Root Layout
+│   ├── page.tsx               # /
+│   └── blog/
+│       └── page.tsx
+└── about/
+    ├── layout.tsx             # About Root Layout
+    ├── page.tsx               # /about
+    └── company/
+        └── page.tsx          # /about/company
+```
+
+Now `app/(main)/layout.tsx` and `app/about/layout.tsx` are **root layouts** for separate sections. **Both** must contain `<html>` and `<body>`.
+
+**Example: `app/about/layout.tsx` as an independent Root Layout**
+
+```tsx
+import type { ReactNode } from "react";
+import "../globals.css";
+
+export default function AboutRootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <header>About Header</header>
+        {children}
+        <footer>About Footer</footer>
+      </body>
+    </html>
+  );
+}
+```
+
+The Main Root Layout must also define `<html>` and `<body>` and should import the shared CSS if needed. The homepage `/` must belong to one of these sections (such as `app/(main)/page.tsx`).
+
+**Tradeoff:** Navigating between pages with different root layouts causes a **full page load**, unlike navigation within one shared root layout.
+
+#### 4. Important rules and common mistakes
+
+| Rule | Explanation |
+| --- | --- |
+| Use `(name)` | Parentheses mark a route group; the group name is omitted from the URL. |
+| Don't create duplicate URLs | `app/(main)/about/page.tsx` and `app/(other)/about/page.tsx` both map to `/about` and conflict. |
+| Avoid two homepages | Don't keep both `app/page.tsx` and `app/(main)/page.tsx` because both map to `/`. |
+| A shared root is still inherited | `app/layout.tsx` wraps pages even if the pages are inside route groups. |
+| Root layouts require `<html>` and `<body>` | Nested layouts must not create another `<html>` or `<body>`. |
+| Each `layout.tsx` needs a React component | The default export must be a valid component that renders its `children` where appropriate. |
+| The URL ignores route groups | To link to `app/(main)/blog/page.tsx`, use `<Link href="/blog">`, not `/main/blog`. |
+
+#### Quick comparison
+
+| Setup | Layouts for `/about/company` | Best for |
+| --- | --- | --- |
+| One shared `app/layout.tsx` | Root Layout → About Layout → Company Page | Most applications; separate section UI without a full reload between roots. |
+| Multiple Root Layouts (no `app/layout.tsx`) | About Root Layout → Company Page | Sections needing fully separate document-level layouts. |
+
+**Practice:** Place your homepage in `(main)`, keep the About/Company pages outside that group, and check that `/about/company` shows only the **About Header**, **Company Page**, and **About Footer**—while still using the shared Root Layout.
+
+**Official documentation:** [Next.js Route Groups](https://nextjs.org/docs/app/api-reference/file-conventions/route-groups) and [Next.js Layouts](https://nextjs.org/docs/app/api-reference/file-conventions/layout).
+
+---
+
+### Navigation using `Link`
 
 Next.js provides a `Link` component for navigating between internal pages.
 
@@ -312,7 +626,7 @@ export default function Home() {
 
 Clicking **Go to About** navigates to `/about`.
 
-### Why use `Link` rather than `<a>` for internal routes?
+#### Why use `Link` rather than `<a>` for internal routes?
 
 - `Link` supports optimized **client-side navigation**.
 - Next.js can **prefetch** linked routes to make navigation feel faster.
@@ -324,7 +638,7 @@ A regular `<a>` tag is still useful for external links or when a full-page navig
 
 ---
 
-## Other important Next.js files
+### Other important Next.js files
 
 You'll encounter these special filenames as you learn more:
 
@@ -342,7 +656,7 @@ You don't need to master every file now. We'll learn them one at a time as they 
 
 ---
 
-## Quick revision
+### Quick revision
 
 | Concept | Remember |
 | --- | --- |
@@ -352,9 +666,11 @@ You don't need to master every file now. We'll learn them one at a time as they 
 | `layout.tsx` | Wraps pages and nested layouts with shared UI. |
 | `children` | The nested page or layout rendered within a layout. |
 | Nested layouts | Let sections like `/dashboard` have their own shared UI. |
+| Route groups `(name)` | Organize pages and give sections different layouts without adding the group name to URLs. |
+| Multiple Root Layouts | Separate root layouts for different sections when there is no shared top-level `app/layout.tsx`. |
 | `Link` | Provides optimized internal navigation. |
 
-### Important takeaway
+#### Important takeaway
 
 ```text
 app/page.tsx                        -> /
@@ -371,7 +687,7 @@ app/layout.tsx -> app/dashboard/layout.tsx -> app/dashboard/settings/page.tsx
 
 ---
 
-## Practice quiz
+### Practice quiz
 
 **1. Which file defines the homepage in an App Router application?**
 
@@ -391,7 +707,7 @@ A. The current nested page or layout
 B. A database record  
 C. The current URL string
 
-### Answers
+#### Answers
 
 1. **B** — `app/page.tsx` maps to `/`.
 2. **B** — Each folder contributes a URL segment.
@@ -399,7 +715,7 @@ C. The current URL string
 
 ---
 
-## Coding exercise
+### Coding exercise
 
 **Task:** Create a Contact page and link to it from the homepage.
 
@@ -425,16 +741,2086 @@ app/
 
 ---
 
-## What's next?
+## Lesson 3: Dynamic Routing and `loading.tsx`
 
-**Lesson 3 — Dynamic Routes, Route Parameters, and Nested Routing**
+> **Version:** Next.js 16 (App Router)  
+> **Goal:** Understand dynamic URL segments, route parameters, loading states, and how to test them.
 
-You'll learn how one file can handle URLs such as:
+---
+
+### 1. What is Dynamic Routing?
+
+In a student management application, every student may have a profile URL:
 
 ```text
-/users/1
-/users/2
-/users/3
+/students/1
+/students/2
+/students/3
 ```
 
-using a dynamic segment, such as `app/users/[id]/page.tsx`.
+We **do not** need to create separate `page.tsx` files for every student. Instead, we use a **dynamic route**: one page component handles different URL values.
+
+#### Folder structure
+
+```text
+app/
+├── layout.tsx
+└── students/
+    ├── page.tsx              # /students — list of students
+    └── [id]/
+        ├── page.tsx          # /students/1, /students/2, etc.
+        └── loading.tsx       # Loading UI for this dynamic page
+```
+
+The square brackets in `[id]` tell Next.js that this part of the URL is **variable**.
+
+| URL | Route file | Captured value |
+| --- | --- | --- |
+| `/students/1` | `app/students/[id]/page.tsx` | `id = "1"` |
+| `/students/2` | `app/students/[id]/page.tsx` | `id = "2"` |
+| `/students/25` | `app/students/[id]/page.tsx` | `id = "25"` |
+
+**Remember:** A folder named `[id]` is a dynamic segment, while a folder named `(main)` is a **route group**. A route group is omitted from the URL; a dynamic segment captures a URL value.
+
+---
+
+### 2. Reading `params` in a Dynamic Page
+
+**File: `app/students/[id]/page.tsx`**
+
+```tsx
+export default async function StudentDetails({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  return (
+    <div>
+      <h1>Student Details</h1>
+      <p>Student ID: {id}</p>
+    </div>
+  );
+}
+```
+
+#### How this works
+
+1. Next.js matches `/students/2` to the `[id]` folder.
+2. It provides `params`, which contains the captured route values.
+3. In Next.js 16, `params` is a **Promise**, so we use `await params`.
+4. `const { id } = await params` extracts the student ID.
+5. The component renders `Student ID: 2`.
+
+#### Understanding the syntax
+
+```tsx
+params: Promise<{ id: string }>
+```
+
+This tells TypeScript that resolving `params` produces an object with a string field called `id`.
+
+```tsx
+const { id } = await params;
+```
+
+This is **object destructuring**. It is similar to:
+
+```tsx
+const resolvedParams = await params;
+const id = resolvedParams.id;
+```
+
+**Important notes:**
+
+- Route parameter values are generally **strings**, even when they look numeric (`"2"`, not `2`).
+- The name in `[id]` determines the key `id`. `[studentId]` would produce `studentId` instead.
+- Pages are Server Components by default. An `async` Server Component can use `await` directly.
+- Older Next.js tutorials may show synchronous `params.id`; for Next.js 16, use `await params`.
+- A dynamic URL segment does **not** necessarily mean the page must be rendered only at request time; some dynamic paths can also be prerendered.
+
+---
+
+### 3. Multiple Dynamic Parameters
+
+You can use more than one dynamic segment:
+
+```text
+app/
+└── departments/
+    └── [department]/
+        └── students/
+            └── [id]/
+                └── page.tsx
+```
+
+This matches `/departments/cse/students/15`.
+
+**File: `app/departments/[department]/students/[id]/page.tsx`**
+
+```tsx
+export default async function StudentPage({
+  params,
+}: {
+  params: Promise<{ department: string; id: string }>;
+}) {
+  const { department, id } = await params;
+
+  return (
+    <div>
+      <p>Department: {department}</p>
+      <p>Student ID: {id}</p>
+    </div>
+  );
+}
+```
+
+For `/departments/cse/students/15`, the resolved parameters are:
+
+```ts
+{ department: "cse", id: "15" }
+```
+
+---
+
+### 4. Linking to Dynamic Pages with `Link`
+
+Rather than typing the URL manually, use `Link` from `next/link`.
+
+**File: `app/students/page.tsx`**
+
+```tsx
+import Link from "next/link";
+
+const students = [
+  { id: 1, name: "Arun" },
+  { id: 2, name: "Rahul" },
+  { id: 3, name: "Anu" },
+];
+
+export default function Students() {
+  return (
+    <main>
+      <h1>Students</h1>
+
+      {students.map((student) => (
+        <p key={student.id}>
+          <Link href={`/students/${student.id}`}>
+            {student.name}
+          </Link>
+        </p>
+      ))}
+    </main>
+  );
+}
+```
+
+The backticks form a **template literal**:
+
+```tsx
+`/students/${student.id}`
+```
+
+For student ID `2`, the link becomes `/students/2`. `Link` enables optimized internal navigation; Next.js can also prefetch route content.
+
+---
+
+### 5. Handling an Invalid ID with `notFound()`
+
+The `[id]` route also matches `/students/999`. Next.js cannot automatically know whether student `999` exists in your data.
+
+For an example with locally defined students:
+
+```tsx
+import { notFound } from "next/navigation";
+
+const students = [
+  { id: 1, name: "Arun" },
+  { id: 2, name: "Rahul" },
+];
+
+export default async function StudentDetails({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const student = students.find((s) => String(s.id) === id);
+
+  if (!student) {
+    notFound();
+  }
+
+  return <h1>{student.name}</h1>;
+}
+```
+
+`notFound()` stops rendering that page and shows the applicable not-found UI. Later, we can do the same validation using a database query instead of an array.
+
+---
+
+### 6. What is `loading.tsx`?
+
+A page may need time to fetch data from an API or database. We should display a useful **loading state** while the content is not ready.
+
+Next.js provides the special filename `loading.tsx` for this purpose.
+
+**File: `app/students/[id]/loading.tsx`**
+
+```tsx
+export default function Loading() {
+  return <h2>Loading student details...</h2>;
+}
+```
+
+When you navigate to a student page, Next.js can show this loading UI while its page content is rendering. Once the content is ready, Next.js replaces the loading UI with the page.
+
+#### What happens behind the scenes?
+
+`loading.tsx` automatically creates a **React Suspense boundary** around the page and nested child content at its segment.
+
+Conceptually:
+
+```text
+User clicks /students/2
+        |
+        v
+Student page is not ready
+        |
+        v
+loading.tsx appears (fallback)
+        |
+        v
+Server finishes rendering page.tsx
+        |
+        v
+Student Details — Student ID: 2
+```
+
+**Suspense in simple terms:** React can show temporary fallback content while something inside that boundary is waiting. When it finishes, React displays the actual content.
+
+**Remember:** `loading.tsx` belongs to the route folder where you want that loading state to apply. For example, `app/students/loading.tsx` applies to the students segment and routes below it; `app/students/[id]/loading.tsx` provides a more specific boundary around the dynamic student page.
+
+---
+
+### 7. Why Might the Loading Screen Be Too Fast to See?
+
+If your page only reads an ID and displays a heading, it may render so quickly that the fallback is barely visible or never noticeably appears.
+
+For learning, simulate a slow operation using `setTimeout` wrapped in a Promise.
+
+**File: `app/students/[id]/page.tsx`**
+
+```tsx
+export default async function StudentDetails({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  // Artificial 3-second delay: for learning only.
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 3000);
+  });
+
+  return (
+    <main>
+      <h1>Student Details</h1>
+      <p>Student ID: {id}</p>
+    </main>
+  );
+}
+```
+
+#### How the delay works
+
+```tsx
+await new Promise<void>((resolve) => {
+  setTimeout(resolve, 3000);
+});
+```
+
+- `Promise` represents a result that will become available later.
+- `setTimeout(resolve, 3000)` schedules `resolve()` after **3,000 milliseconds (3 seconds)**.
+- `await` pauses **this async function** until the Promise resolves; it does not freeze the entire server.
+- The component then returns its page content.
+
+The artificial delay happens on the **server** because this is a Server Component.
+
+#### How to test
+
+1. Run `npm run dev`.
+2. Open the student list, for example `http://localhost:4004/students` (use your configured port).
+3. Click a student link to navigate to `/students/2`.
+4. While the page waits, look for `Loading student details...`.
+5. After about 3 seconds, the actual Student Details page should appear.
+
+If you do not notice the fallback, try navigating to a **different student ID**. Route prefetching, caching, and development behavior can affect what you see. A hard reload may also behave differently from a navigation using `Link`. With a very small streamed response, browser buffering may make the fallback harder to observe.
+
+**Do not add artificial delays in production.** They are only useful for demonstrations or testing.
+
+---
+
+### 8. The Prerendering / Blocking Route Error You Encountered
+
+You previously saw a Next.js development warning like:
+
+```text
+Next.js encountered runtime data during prerendering.
+```
+
+It pointed to:
+
+```tsx
+const { id } = await params;
+```
+
+When **Cache Components** and instant-navigation checks are enabled, Next.js expects request-dependent or uncached asynchronous work to be handled with an appropriate Suspense fallback, cached where suitable, or otherwise configured for the intended rendering behavior.
+
+Adding this file resolved the issue in your project:
+
+```text
+app/students/[id]/loading.tsx
+```
+
+```tsx
+export default function Loading() {
+  return <p>Loading student details...</p>;
+}
+```
+
+This solution works by providing a Suspense boundary around the page. It does **not** mean `await params` is incorrect; `await params` is the correct pattern in Next.js 16.
+
+Not every dynamic route in every Next.js configuration needs its own `loading.tsx`. The requirement depends on the route's rendering and caching settings. `loading.tsx` is a useful Suspense boundary, not a general replacement for data validation or error handling.
+
+---
+
+### 9. Dynamic Route Params vs Search Params
+
+Do not confuse these two URL styles:
+
+| Example | Type | Used for |
+| --- | --- | --- |
+| `/students/2` | Dynamic path parameter | Identifying a student resource |
+| `/students?id=2` | Search (query-string) parameter | Filtering or selecting data |
+
+Dynamic path parameters are read using `params`. Search parameters are read using `searchParams` in page components (also a Promise in Next.js 16). We'll study search parameters separately.
+
+---
+
+### 10. Quick Revision Table
+
+| Concept | Meaning |
+| --- | --- |
+| `[id]` | Captures a value from a URL path segment. |
+| `params` | Contains dynamic route values. |
+| `Promise<{ id: string }>` | TypeScript type of the asynchronous `params` value. |
+| `await params` | Resolves the route parameters. |
+| `Link` | Navigates to another route using Next.js. |
+| `notFound()` | Displays not-found UI for an invalid resource. |
+| `loading.tsx` | Defines fallback UI during route loading. |
+| `Suspense` | Allows fallback content while nested content is waiting. |
+| `setTimeout` + `Promise` | Simulates a delay for testing. |
+| `()` | Route grouping without adding the group name to the URL. |
+| `[]` | Dynamic routing with a value captured from the URL. |
+
+#### Key ideas to remember
+
+1. **One `[id]/page.tsx` handles many IDs.**
+2. **In Next.js 16, `params` is a Promise; await it in Server Components.**
+3. **Route values are strings unless you convert and validate them.**
+4. **`loading.tsx` provides a Suspense-based loading fallback.**
+5. **A simulated delay is only for learning, not production.**
+
+---
+
+### 11. Practice Exercises
+
+**Exercise 1 — Products**
+
+Create `app/products/[id]/page.tsx` and display the product ID for `/products/101`, `/products/102`, and `/products/103` using only one page file.
+
+**Exercise 2 — Loading UI**
+
+Create `app/products/[id]/loading.tsx` showing `Loading product details...`. Add a temporary 2-second delay inside the product page to test it.
+
+**Exercise 3 — Links**
+
+Create `app/products/page.tsx` with links to the three product pages.
+
+**Exercise 4 — Invalid product**
+
+Create a small local products array and use `notFound()` when the requested product ID does not exist.
+
+#### Self-check questions
+
+1. What is the difference between `(main)` and `[id]`?
+2. Why is `params` typed as `Promise<{ id: string }>` in Next.js 16?
+3. Why might a loading screen be invisible on a very fast page?
+4. What is the relationship between `loading.tsx` and Suspense?
+5. Should we deliberately delay real production pages?
+
+---
+
+## Lesson 4: Advanced Routing and Query Parameters
+
+> **Version:** Next.js 16 (App Router)  
+> **Prerequisites:** `page.tsx`, `layout.tsx`, route groups `(main)`, dynamic segments `[id]`, and `loading.tsx`.  
+> **Goal:** Understand catch-all routes, optional catch-all routes, URL search parameters, and how Server and Client Components read them.
+
+---
+
+### 1. Quick Recap: Normal Dynamic Routes `[id]`
+
+A normal dynamic route captures **exactly one** URL segment.
+
+```text
+app/
+└── students/
+    └── [id]/
+        └── page.tsx
+```
+
+| URL | Captured parameter |
+| --- | --- |
+| `/students/10` | `{ id: "10" }` |
+| `/students/25` | `{ id: "25" }` |
+
+```tsx
+// app/students/[id]/page.tsx
+export default async function StudentPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return <h1>Student ID: {id}</h1>;
+}
+```
+
+In Next.js 16, **`params` is a Promise** in a page's props, so use `await params`. Dynamic parameter values from the URL are strings.
+
+**But what if a URL contains more than one varying segment?** That is where catch-all routes are useful.
+
+---
+
+### 2. Catch-All Routes `[...slug]`
+
+A **catch-all route** captures **one or more URL segments** with a single route file.
+
+Imagine a documentation website:
+
+```text
+/docs/nextjs
+/docs/nextjs/routing
+/docs/nextjs/routing/dynamic-routes
+```
+
+#### Folder structure
+
+```text
+app/
+└── docs/
+    └── [...slug]/
+        ├── page.tsx
+        └── loading.tsx    # Optional loading UI
+```
+
+The three dots (`...`) mean **capture the remaining path segments**.
+
+#### Implementation
+
+**File: `app/docs/[...slug]/page.tsx`**
+
+```tsx
+export default async function DocsPage({
+  params,
+}: {
+  params: Promise<{ slug: string[] }>;
+}) {
+  const { slug } = await params;
+
+  return (
+    <div>
+      <h1>Documentation</h1>
+      <p>Segments: {slug.join(" / ")}</p>
+    </div>
+  );
+}
+```
+
+#### How the captured values look
+
+| URL | `slug` value |
+| --- | --- |
+| `/docs/nextjs` | `["nextjs"]` |
+| `/docs/nextjs/routing` | `["nextjs", "routing"]` |
+| `/docs/nextjs/routing/dynamic-routes` | `["nextjs", "routing", "dynamic-routes"]` |
+
+Notice the TypeScript type:
+
+```tsx
+params: Promise<{ slug: string[] }>;
+```
+
+It is an **array of strings** because more than one segment may be captured.
+
+#### What does `join()` do?
+
+```ts
+const slug = ["nextjs", "routing", "dynamic-routes"];
+console.log(slug.join(" / "));
+// nextjs / routing / dynamic-routes
+```
+
+`join()` combines the elements of an array into a string, using the supplied separator.
+
+#### Important limitation
+
+With a folder named `[...slug]`, `/docs` by itself **does not match** that catch-all page. The route expects **at least one** path segment after `/docs`.
+
+---
+
+### 3. Optional Catch-All Routes `[[...slug]]`
+
+An **optional catch-all route** is similar to `[...slug]`, except it also matches the parent URL with **zero** additional segments.
+
+Replace `[...slug]` with `[[...slug]]`:
+
+```text
+app/
+└── docs/
+    └── [[...slug]]/
+        ├── page.tsx
+        └── loading.tsx
+```
+
+**File: `app/docs/[[...slug]]/page.tsx`**
+
+```tsx
+export default async function DocsPage({
+  params,
+}: {
+  params: Promise<{ slug?: string[] }>;
+}) {
+  const { slug } = await params;
+
+  return (
+    <div>
+      <h1>Documentation</h1>
+      <p>{slug ? slug.join(" / ") : "Documentation Home"}</p>
+    </div>
+  );
+}
+```
+
+| URL | `slug` value | Output |
+| --- | --- | --- |
+| `/docs` | `undefined` | Documentation Home |
+| `/docs/nextjs` | `["nextjs"]` | nextjs |
+| `/docs/nextjs/routing` | `["nextjs", "routing"]` | nextjs / routing |
+
+#### Why `slug?: string[]`?
+
+The `?` means the `slug` property is **optional**. When the URL is exactly `/docs`, there may be no `slug` value.
+
+#### Important
+
+Use **either** `[...slug]` **or** `[[...slug]]` for this docs example. Do not keep both folders for the same route pattern, because their matching routes overlap.
+
+---
+
+### 4. Comparing `[id]`, `[...slug]`, and `[[...slug]]`
+
+| Folder name | How many segments? | Example | Parameter type |
+| --- | --- | --- | --- |
+| `[id]` | Exactly one | `/students/10` | `string` |
+| `[...slug]` | One or more | `/docs/a/b` | `string[]` |
+| `[[...slug]]` | Zero or more | `/docs`, `/docs/a/b` | `string[] \| undefined` |
+
+**Easy way to remember:**
+
+- `[id]`: I need exactly **one** value.
+- `[...slug]`: I need **at least one**, possibly several.
+- `[[...slug]]`: I can have **none or several**.
+
+**Real-world examples:** Documentation paths, nested product categories, file browsers, and content hierarchies.
+
+#### Related concept: `(main)` is not a dynamic route
+
+Recall from Lesson 2:
+
+```text
+app/(main)/page.tsx   -> /
+app/students/[id]/page.tsx -> /students/10
+```
+
+A folder in parentheses is a **route group**; it does not appear in the URL. A folder in square brackets is a **dynamic segment**; it captures a URL value.
+
+---
+
+### 5. Search Parameters (`searchParams`)
+
+Now consider an e-commerce website where users filter or sort products:
+
+```text
+/products?category=electronics&sort=asc
+```
+
+Break it down:
+
+- `/products` — the **pathname** (route).
+- `?` — starts the **query string**.
+- `category=electronics` — a query parameter (key and value).
+- `&` — separates query parameters.
+- `sort=asc` — another query parameter.
+
+**Unlike a dynamic path segment, query parameters do not require folders named after their keys.**
+
+#### Step 1 — Create a page
+
+```text
+app/
+└── products/
+    ├── page.tsx
+    └── loading.tsx
+```
+
+**File: `app/products/page.tsx`**
+
+```tsx
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    category?: string | string[];
+    sort?: string | string[];
+  }>;
+}) {
+  const query = await searchParams;
+  const category =
+    typeof query.category === "string" ? query.category : "all";
+  const sort = typeof query.sort === "string" ? query.sort : "asc";
+
+  return (
+    <div>
+      <h1>Products</h1>
+      <p>Category: {category}</p>
+      <p>Sort: {sort}</p>
+    </div>
+  );
+}
+```
+
+**File: `app/products/loading.tsx`**
+
+```tsx
+export default function Loading() {
+  return <p>Loading products...</p>;
+}
+```
+
+#### Test these URLs
+
+| URL | Category output | Sort output |
+| --- | --- | --- |
+| `/products` | all | asc |
+| `/products?category=electronics` | electronics | asc |
+| `/products?category=clothing&sort=desc` | clothing | desc |
+
+#### Understanding the default values
+
+```tsx
+const query = await searchParams;
+const category = typeof query.category === "string" ? query.category : "all";
+const sort = typeof query.sort === "string" ? query.sort : "asc";
+```
+
+This resolves the Promise, reads each key, and chooses a default when the value is absent **or not a single string** (for example, if the key is repeated). For a real application, also check that `sort` is one of the allowed values, such as `asc` or `desc`.
+
+**Note:** In Next.js 16, the page's `searchParams` prop is a **Promise**, just like `params`.
+
+#### TypeScript detail: repeated query keys
+
+A URL may repeat a key:
+
+```text
+/products?category=books&category=games
+```
+
+In that case, the raw value can be an array. A more general TypeScript shape is:
+
+```tsx
+searchParams: Promise<{
+  [key: string]: string | string[] | undefined;
+}>;
+```
+
+The products-page example above handles repeated keys by falling back to a default; another application may choose the first value instead. For real applications, **validate and normalize** search parameters before relying on them. Also note that `searchParams` in a page is a plain object, **not** an instance of `URLSearchParams`.
+
+---
+
+### 6. Difference Between `params` and `searchParams`
+
+| Feature | `params` | `searchParams` |
+| --- | --- | --- |
+| Where is the value? | In the URL path | In the query string after `?` |
+| Example | `/products/10` | `/products?sort=asc` |
+| Folder pattern | `[id]` | No query-specific folder needed |
+| Common purpose | Identify a resource | Filtering, sorting, searching |
+| Server page access (Next.js 16) | `await params` | `await searchParams` |
+
+#### Using both in the same page
+
+URL:
+
+```text
+/products/10?color=red
+```
+
+**File: `app/products/[id]/page.tsx`**
+
+```tsx
+export default async function ProductDetails({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ color?: string | string[] }>;
+}) {
+  const { id } = await params;
+  const query = await searchParams;
+  const color = typeof query.color === "string" ? query.color : "default";
+
+  return (
+    <div>
+      <h1>Product: {id}</h1>
+      <p>Selected Color: {color}</p>
+    </div>
+  );
+}
+```
+
+The **path** identifies product `10`; the **query string** supplies the selected color `red`.
+
+---
+
+### 7. `useSearchParams()` in Client Components
+
+We've used the `searchParams` prop in **Server Component pages**. What if we need the current query string inside a **Client Component**?
+
+Next.js provides a hook:
+
+```tsx
+import { useSearchParams } from "next/navigation";
+```
+
+#### Example: Search viewer
+
+**File: `app/search/SearchViewer.tsx`**
+
+```tsx
+"use client";
+
+import { useSearchParams } from "next/navigation";
+
+export default function SearchViewer() {
+  const searchParams = useSearchParams();
+  const query = searchParams.get("q");
+
+  return (
+    <div>
+      <h1>Search</h1>
+      <p>Searching for: {query ?? "Nothing"}</p>
+    </div>
+  );
+}
+```
+
+**File: `app/search/page.tsx`**
+
+```tsx
+import { Suspense } from "react";
+import SearchViewer from "./SearchViewer";
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<p>Loading search...</p>}>
+      <SearchViewer />
+    </Suspense>
+  );
+}
+```
+
+Open:
+
+```text
+http://localhost:4004/search?q=nextjs
+```
+
+Expected output:
+
+```text
+Search
+Searching for: nextjs
+```
+
+#### Why `"use client"`?
+
+`useSearchParams()` is a **Client Component hook**. It reads the query string and can update as navigation changes it.
+
+#### Why `<Suspense>`?
+
+A Client Component calling `useSearchParams()` can suspend while a static route is prerendered. The Suspense boundary gives Next.js a fallback and keeps the surrounding page eligible for static rendering. This is especially important for production builds of statically rendered routes.
+
+#### `searchParams` versus `useSearchParams()`
+
+| | `searchParams` page prop | `useSearchParams()` hook |
+| --- | --- | --- |
+| Where? | Page Server Component | Client Component |
+| How? | `await searchParams` | `useSearchParams().get("q")` |
+| Needs `"use client"`? | No | Yes |
+| Useful for | Server-side filtering/data fetching | Reactive client-side query display |
+
+**Why use `useSearchParams()` when the server can read `searchParams`?**
+
+- Use the **server page prop** when query values affect data fetching or database filtering. It is read again when navigating to a page with a new query string.
+- Use the **client hook** when a search field, filter chip, pagination widget, or shared layout control must react to the current query string in the browser.
+- You can use both together: a Client Component updates the URL, and the Server Component page fetches the corresponding data. You do **not** need client-side fetching just because a filter is interactive.
+- Unlike pages, Server Component layouts do not receive a `searchParams` prop; a nested Client Component can read the current query with `useSearchParams()`.
+
+**Important:** `useSearchParams()` reads the query; it does not modify the URL. To change query parameters from a Client Component, use `Link` or navigation methods such as `router.push()`.
+
+---
+
+### 8. What About `loading.tsx` and Suspense?
+
+From Lesson 3, you already know that a route can provide automatic loading UI with `loading.tsx`.
+
+```text
+app/docs/[...slug]/
+├── page.tsx
+└── loading.tsx
+```
+
+```tsx
+// app/docs/[...slug]/loading.tsx
+export default function Loading() {
+  return <p>Loading documentation...</p>;
+}
+```
+
+`loading.tsx` creates a loading boundary for that route segment. This can be useful when the page awaits route parameters or slow server-side data.
+
+By comparison, a manual `<Suspense>` boundary in `app/search/page.tsx` wraps **a specific component**, such as `SearchViewer`.
+
+**Remember:** These are related ideas, but not identical placements of the loading boundary.
+
+---
+
+### 9. Common Mistakes
+
+1. **Using `string` for catch-all `slug`:** `[...slug]` produces `string[]`, not `string`.
+2. **Expecting `[...slug]` to match `/docs`:** Use `[[...slug]]` when the empty path should match.
+3. **Keeping conflicting catch-all patterns:** Do not define overlapping catch-all and optional catch-all routes for the same URLs.
+4. **Confusing `(main)` with `[id]`:** Parentheses are for organizational route groups; square brackets capture dynamic values.
+5. **Reading Next.js 16 page props synchronously:** Use `await params` and `await searchParams` in async Server Component pages.
+6. **Assuming query parameters are always a string:** A repeated query key can produce `string[]`.
+7. **Using `useSearchParams()` in a Server Component:** It is a Client Component hook; put it in a file with `"use client"` and wrap it in Suspense when appropriate.
+8. **Assuming a URL query changes the folder route:** `/products?sort=asc` still uses `app/products/page.tsx`.
+
+---
+
+### 10. Quick Revision
+
+| Concept | Remember |
+| --- | --- |
+| `[id]` | One URL segment (`string`) |
+| `[...slug]` | One or more URL segments (`string[]`) |
+| `[[...slug]]` | Zero or more URL segments (`string[]` or `undefined`) |
+| `params` | Dynamic **path** values, provided asynchronously in Next.js 16 |
+| `searchParams` | **Query-string** values, provided asynchronously in Next.js 16 |
+| `useSearchParams()` | Client Component hook for reading query values |
+| `loading.tsx` | Automatic route-segment loading UI |
+| `<Suspense>` | Fallback boundary around asynchronous/suspending content |
+| `(name)` | Route group — does not appear in the URL |
+
+---
+
+### 11. Coding Exercise — Product Category Browser
+
+Create this structure:
+
+```text
+app/
+└── shop/
+    └── [[...category]]/
+        └── page.tsx
+```
+
+**Requirements:**
+
+1. `/shop` shows `All Products`.
+2. `/shop/electronics` shows the `electronics` category.
+3. `/shop/electronics/mobile` shows both category segments.
+4. `/shop/electronics/mobile?sort=asc` also displays the sort parameter.
+5. Use `await params` and `await searchParams` as in the examples above.
+
+#### Self-check questions
+
+1. Why does `[...slug]` return an array rather than a string?
+2. What changes when you add another pair of square brackets: `[[...slug]]`?
+3. Where do query parameters appear in a URL?
+4. How is `params` different from `searchParams`?
+5. Why does `useSearchParams()` require a Client Component?
+6. What purpose does a Suspense boundary serve in the search example?
+
+---
+
+## Lesson 5: Server Components vs. Client Components
+
+> **Level:** Beginner to Intermediate  
+> **Project:** Next.js 16 (App Router)  
+> **Prerequisites:** Pages, layouts, dynamic routing, `loading.tsx`, and `searchParams`
+
+### What you'll learn
+
+1. What Server Components and Client Components are.
+2. Why Server Components are the default in the App Router.
+3. When and why to use `"use client"`.
+4. How React state and event handlers work in Client Components.
+5. How Server and Client Components work together.
+6. How to pass data from the server to a client component.
+7. What hydration means.
+8. Common mistakes and best practices.
+
+---
+
+### 5.1 — What are Server Components and Client Components?
+
+Next.js has two important types of React components:
+
+- **Server Components:** Render on the server. They're useful for accessing server-side data, fetching from databases, and producing non-interactive UI without sending that component's JavaScript to the browser.
+- **Client Components:** Support interactive behavior such as clicks, component state (`useState`), effects (`useEffect`), and browser APIs.
+
+**In Next.js App Router, components are Server Components by default.**
+
+```text
+                         NEXT.JS SERVER
+                  ┌────────────────────────┐
+                  │ Server Components      │
+                  │ - Fetch data           │
+                  │ - Query the database   │
+                  │ - Render page content  │
+                  └───────────┬────────────┘
+                              │
+                 HTML + React Server Component data
+                              │
+                              ▼
+                           BROWSER
+                  ┌────────────────────────┐
+                  │ Displays the page      │
+                  │                        │
+                  │ Client Components:     │
+                  │ - onClick              │
+                  │ - useState             │
+                  │ - useEffect            │
+                  └────────────────────────┘
+```
+
+> **Important:** A Client Component can still be *prerendered* to HTML on the server during the initial request. `"use client"` means the component participates in the client-side React application; it doesn't mean the component is only ever rendered in a browser.
+
+---
+
+### 5.2 — Understanding Server Components
+
+This is a Server Component because there is no `"use client"` directive:
+
+**File:** `app/page.tsx`
+
+```tsx
+export default function Home() {
+  return (
+    <div>
+      <h1>Welcome to Next.js</h1>
+      <p>This is my homepage.</p>
+    </div>
+  );
+}
+```
+
+#### Example: Render student data
+
+**File:** `app/students/page.tsx`
+
+```tsx
+const students = [
+  { id: 1, name: "Arun" },
+  { id: 2, name: "Rahul" },
+  { id: 3, name: "Anu" },
+];
+
+export default function StudentsPage() {
+  return (
+    <main>
+      <h1>Students</h1>
+
+      {students.map((student) => (
+        <p key={student.id}>{student.name}</p>
+      ))}
+    </main>
+  );
+}
+```
+
+In a future database lesson, this could be replaced with a server-side PostgreSQL query using Drizzle ORM:
+
+```tsx
+// Illustration only; assumes db and studentsTable are configured.
+const students = await db.select().from(studentsTable);
+```
+
+#### Why use Server Components?
+
+- They can query a database and call server-side services directly.
+- They can access private server environment variables; never render secrets into the page or send them as props.
+- Their component code isn't shipped as client-side JavaScript.
+- They're well suited to product listings, dashboards, reports, and other data-driven pages.
+
+#### What can't you do directly in a Server Component?
+
+You cannot directly use browser-side interactive hooks or event handlers, such as:
+
+```tsx
+useState(0);                 // Not supported directly in a Server Component
+useEffect(() => {}, []);     // Not supported directly in a Server Component
+<button onClick={...}>       // Interactive handlers require a Client Component
+```
+
+For those, create a Client Component.
+
+---
+
+### 5.3 — Understanding Client Components
+
+Imagine a counter with **Increment** and **Decrement** buttons. Because the UI updates in response to clicks, we need `useState` and an event handler.
+
+**File:** `app/components/Counter.tsx`
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <h1>Counter: {count}</h1>
+
+      <button onClick={() => setCount(count + 1)}>
+        Increment
+      </button>
+
+      <button onClick={() => setCount(count - 1)}>
+        Decrement
+      </button>
+    </div>
+  );
+}
+```
+
+#### Understand the code
+
+**1. `"use client"`**
+
+```tsx
+"use client";
+```
+
+- Put this directive at the **top of the file, before imports**.
+- It marks a boundary where the imported component and its module dependencies are part of the client-side module graph.
+- You don't need to repeat it in every component imported from an existing client boundary.
+
+**2. `useState`**
+
+```tsx
+const [count, setCount] = useState(0);
+```
+
+- `count`: Current state value.
+- `setCount`: Function used to update the value.
+- `0`: Initial state value.
+
+**3. `onClick`**
+
+```tsx
+<button onClick={() => setCount(count + 1)}>
+  Increment
+</button>
+```
+
+When clicked, React updates the component's state and rerenders it **without a full page reload**.
+
+#### What happens if you remove `"use client"`?
+
+If this component is treated as a Server Component, Next.js reports an error because `useState` needs a Client Component. Restore `"use client"` to enable its interactive functionality.
+
+---
+
+### 5.4 — Server vs. Client Components: Comparison
+
+| Feature | Server Component | Client Component |
+|---|---|---|
+| Render JSX | Yes | Yes |
+| Fetch data | Yes | Yes |
+| Query database directly | Yes | No; use a server endpoint/function |
+| Access server-only secrets | Yes, with care | No |
+| `useState` | No | Yes |
+| `useEffect` | No | Yes |
+| Browser event handlers (`onClick`, `onChange`) | No | Yes |
+| Browser APIs (`localStorage`, `window`) | No | Yes, after running in browser |
+| `async` component function | Yes | Generally not supported |
+| Requires `"use client"` | No | Yes, at the client boundary |
+
+> **Note:** Client Components may be prerendered on the server. Code that accesses `window` or `localStorage` should run in browser-only effects/event handlers or be guarded appropriately.
+
+---
+
+### 5.5 — Can a Server Component render a Client Component?
+
+**Yes. This is one of the most common Next.js patterns.** Keep the overall page on the server and make only the interactive parts Client Components.
+
+**File structure:**
+
+```text
+app/
+├── page.tsx
+└── components/
+    └── Counter.tsx
+```
+
+**File:** `app/page.tsx` (Server Component)
+
+```tsx
+import Counter from "./components/Counter";
+
+export default function Home() {
+  return (
+    <main>
+      <h1>Welcome to Next.js</h1>
+      <p>This content is rendered on the server.</p>
+      <Counter />
+    </main>
+  );
+}
+```
+
+**File:** `app/components/Counter.tsx` (Client Component)
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <button onClick={() => setCount((previous) => previous + 1)}>
+      Count: {count}
+    </button>
+  );
+}
+```
+
+**Rendering relationship:**
+
+```text
+Home (Server Component)
+├── <h1>Welcome to Next.js</h1>
+├── <p>This content is rendered on the server.</p>
+└── Counter (Client Component)
+    └── Interactive button with useState
+```
+
+#### Important boundary rule
+
+- A **Server Component can import and render a Client Component**.
+- When a file has `"use client"`, its imports are included in the client module graph, so don't import server-only database modules into that file.
+- Advanced pattern: You can pass server-rendered content as `children` or other React element props into a Client Component rather than importing server-only code directly inside it.
+
+---
+
+### 5.6 — Passing data from Server to Client Components
+
+We often fetch data on the server, then pass individual data values to interactive Client Components through **props**.
+
+#### Step 1 — Create a Client Component
+
+**File:** `app/students/StudentCard.tsx`
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+type StudentCardProps = {
+  id: number;
+  name: string;
+};
+
+export default function StudentCard({
+  id,
+  name,
+}: StudentCardProps) {
+  const [selected, setSelected] = useState(false);
+
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>Student ID: {id}</p>
+
+      <button onClick={() => setSelected(!selected)}>
+        {selected ? "Selected" : "Select"}
+      </button>
+    </div>
+  );
+}
+```
+
+Here:
+
+- `id` and `name` are received as **props**.
+- `selected` is local Client Component **state**.
+- Clicking the button updates the local state; it does not modify server data.
+
+#### Step 2 — Pass data from a Server Component
+
+**File:** `app/students/page.tsx`
+
+```tsx
+import StudentCard from "./StudentCard";
+
+const students = [
+  { id: 1, name: "Arun" },
+  { id: 2, name: "Rahul" },
+  { id: 3, name: "Anu" },
+];
+
+export default function StudentsPage() {
+  return (
+    <main>
+      <h1>Students List</h1>
+
+      {students.map((student) => (
+        <StudentCard
+          key={student.id}
+          id={student.id}
+          name={student.name}
+        />
+      ))}
+    </main>
+  );
+}
+```
+
+**Flow of data:**
+
+```text
+StudentsPage (Server Component)
+       │
+       │ Provides id and name props
+       ▼
+StudentCard (Client Component)
+       │
+       ├── Displays student information
+       └── Uses useState for the Select button
+```
+
+#### Rules for passing props
+
+- Props crossing from Server to Client Components must be **serializable by React**.
+- Simple strings, numbers, arrays, and plain data objects are typical choices.
+- An ordinary JavaScript callback such as `onClick={() => ...}` cannot be passed directly from a Server Component to a Client Component across this boundary. Server Functions are a special case we'll cover later.
+- State maintained with `useState` is temporary and resets on a fresh page load unless you persist it separately.
+
+---
+
+### 5.7 — What is hydration?
+
+When a page initially loads, Next.js can send HTML to the browser so content appears quickly. But plain HTML doesn't know how to execute React click handlers.
+
+**Hydration** is the process where React attaches interactive behavior to the prerendered Client Component markup in the browser.
+
+```text
+1. Server prepares the initial HTML
+                 │
+                 ▼
+2. Browser displays the HTML
+                 │
+                 ▼
+3. Client JavaScript loads
+                 │
+                 ▼
+4. React hydrates Client Components
+                 │
+                 ▼
+5. Buttons, state, and interactions work
+```
+
+#### Why this matters
+
+- Users can see content before all client JavaScript finishes loading.
+- Client Components gain React-powered interactivity during hydration.
+- Server Components themselves do **not** hydrate like Client Components because their component JavaScript isn't sent to the browser.
+
+---
+
+### 5.8 — Common mistakes
+
+#### Mistake 1: Adding `"use client"` everywhere
+
+**Better:** Use Server Components by default. Add a Client Component only for interactive or browser-dependent parts.
+
+#### Mistake 2: Calling `useState` inside a Server Component
+
+**Better:** Move that stateful logic to a Client Component.
+
+#### Mistake 3: Importing database code in a Client Component
+
+**Better:** Query the database on the server, then pass safe data as props, or call a server endpoint/function.
+
+#### Mistake 4: Assuming `"use client"` means browser-only rendering
+
+**Better:** Remember that Client Components can also have HTML prerendered on the server. Browser-only APIs must be used carefully.
+
+#### Mistake 5: Adding `"use server"` to every Server Component
+
+**Better:** Don't do this. **Server Components are the default.** `"use server"` is for Server Functions (which we'll study when learning forms and mutations).
+
+---
+
+### 5.9 — Quick revision
+
+| Concept | Remember |
+|---|---|
+| Server Component | Default component type in App Router |
+| Client Component | Supports interactive React and browser-side behavior |
+| `"use client"` | Creates a client module boundary |
+| `useState` | Stores local state in a Client Component |
+| `useEffect` | Handles effects in a Client Component |
+| Props | Pass data between components |
+| Hydration | Adds React interactivity to prerendered Client Components |
+| `"use server"` | Marks Server Functions; not required for Server Components |
+
+#### Simple decision rule
+
+```text
+Does the component need browser events, state, effects, or browser APIs?
+  ├── Yes → Use a Client Component ("use client")
+  └── No  → Prefer a Server Component (default)
+```
+
+---
+
+### 5.10 — Practice quiz
+
+**1. What is the default component type in the App Router?**
+
+A. Client Component  
+B. Server Component  
+C. Both automatically
+
+**2. Which feature requires a Client Component?**
+
+A. Rendering a heading  
+B. Using `useState` for a counter  
+C. Querying a database directly
+
+**3. Can a Server Component render a Client Component?**
+
+A. Yes  
+B. No  
+C. Only inside `layout.tsx`
+
+**4. What does hydration do?**
+
+A. Queries PostgreSQL  
+B. Makes prerendered Client Components interactive  
+C. Creates URL routes
+
+**Answers:** 1-B, 2-B, 3-A, 4-B.
+
+---
+
+### 5.11 — Coding exercise
+
+Build the student selection example yourself:
+
+1. Create `app/students/StudentCard.tsx` and add `"use client"`.
+2. Add `useState` to track whether a student has been selected.
+3. Create `app/students/page.tsx` as a Server Component.
+4. Pass each student's `id` and `name` as props to `StudentCard`.
+5. Confirm clicking **Select** changes only that student's card without refreshing the page.
+6. **Extra challenge:** Add a Reset button that sets `selected` back to `false`.
+
+#### Expected folder structure
+
+```text
+app/
+└── students/
+    ├── page.tsx         # Server Component
+    └── StudentCard.tsx  # Client Component
+```
+
+---
+
+## Lesson 6: React Hooks and Event Handling
+
+> **Level:** Beginner → Intermediate  
+> **Prerequisite:** Lesson 5 — Server Components vs. Client Components  
+> **Focus:** `useState`, event handlers, `useEffect`, cleanup, and practical state management
+
+### What we will learn
+
+1. What React Hooks are.
+2. Why `useState()` is needed and how it works.
+3. Updating state using previous values.
+4. Handling `onClick`, `onChange`, and `onSubmit` events.
+5. Understanding `useEffect()` and dependency arrays.
+6. Cleaning up effects and understanding Strict Mode.
+7. Building a student-search application using Server and Client Components.
+8. Rules of Hooks and common mistakes.
+
+---
+
+### 6.1 — What are React Hooks?
+
+**React Hooks** are functions that let React components use features such as state, effects, references, and shared context.
+
+| Hook | Purpose |
+| --- | --- |
+| `useState` | Store and update a component's state. |
+| `useEffect` | Synchronize the component with an external system. |
+| `useRef` | Keep a mutable value between renders, or access a DOM element, without triggering a rerender. |
+| `useContext` | Read values provided by React context. |
+| `useReducer` | Manage more complex state updates. |
+| `useMemo` | Cache the result of a calculation. |
+
+This lesson focuses on **`useState` and `useEffect`**. The example routes are independent practice exercises: if you already created a route such as `app/students/page.tsx` in a previous lesson, you can edit it or choose a new example path.
+
+**Next.js reminder:** In the App Router, components are Server Components by default. To use interactive hooks such as `useState` and `useEffect`, make the component a Client Component using `"use client"`, or put it inside an existing client boundary.
+
+---
+
+### 6.2 — Why do we need `useState()`?
+
+A normal JavaScript variable does not tell React to update the displayed UI.
+
+#### Example: A normal variable (incorrect for UI state)
+
+```tsx
+"use client";
+
+export default function Counter() {
+  let count = 0;
+
+  function increment() {
+    count++;
+    console.log(count);
+  }
+
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+```
+
+Clicking the button changes the local variable inside the event handler, but **does not trigger a React rerender**. Local variables also reset when the component function executes on a later render.
+
+#### Solution: Store the value in React state
+
+**File: `app/counter/page.tsx`**
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  function increment() {
+    setCount(count + 1);
+  }
+
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+```
+
+#### Understanding the syntax
+
+```tsx
+const [count, setCount] = useState(0);
+```
+
+| Part | Meaning |
+| --- | --- |
+| `count` | The current state value. |
+| `setCount` | Function that requests a state update. |
+| `useState(0)` | Sets the initial value to `0`. |
+
+React stores the state between renders of the same mounted component. Calling a setter schedules a new render with the updated state.
+
+**Render sequence:**
+
+```text
+Initial render: count = 0
+        ↓
+User clicks Increment
+        ↓
+setCount(count + 1)
+        ↓
+React rerenders the component
+        ↓
+UI displays: Count: 1
+```
+
+---
+
+### 6.3 — Updating state using its previous value
+
+There are two common approaches:
+
+```tsx
+// Directly calculate from the value in this render
+setCount(count + 1);
+
+// Calculate from the pending previous state
+setCount((prev) => prev + 1);
+```
+
+Both work for a simple click. **Prefer the functional updater when the next value depends on the previous value.**
+
+#### Example: Increment three times
+
+This code does **not** reliably add three because each call uses the same captured `count`:
+
+```tsx
+function incrementThreeTimes() {
+  setCount(count + 1);
+  setCount(count + 1);
+  setCount(count + 1);
+}
+```
+
+Use functional updates instead:
+
+```tsx
+function incrementThreeTimes() {
+  setCount((prev) => prev + 1);
+  setCount((prev) => prev + 1);
+  setCount((prev) => prev + 1);
+}
+```
+
+If the starting value is `0`, React applies these updates as `0 → 1 → 2 → 3`.
+
+---
+
+### 6.4 — Event handling in React
+
+An **event handler** is a function React calls in response to a user interaction.
+
+| Event | Typical use |
+| --- | --- |
+| `onClick` | Clicking a button. |
+| `onChange` | Editing an input. |
+| `onSubmit` | Submitting a form. |
+| `onKeyDown` | Pressing a key. |
+| `onFocus` | Focusing an input. |
+| `onBlur` | Leaving an input. |
+
+#### Example 1: `onClick`
+
+```tsx
+"use client";
+
+export default function Button() {
+  function handleClick() {
+    alert("Button clicked!");
+  }
+
+  return <button onClick={handleClick}>Click Me</button>;
+}
+```
+
+**Remember:** `onClick={handleClick}` passes a function. `onClick={handleClick()}` calls it during rendering and is usually incorrect.
+
+#### Example 2: `onChange` and controlled inputs
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+export default function NameInput() {
+  const [name, setName] = useState("");
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+      />
+
+      <p>Your name: {name}</p>
+    </div>
+  );
+}
+```
+
+- `value={name}` controls the input's displayed value.
+- `onChange` runs when the user changes the input.
+- `event.target.value` reads the latest text.
+- `setName()` updates state and causes the component to rerender.
+
+This is called a **controlled input**.
+
+#### Example 3: `onSubmit`
+
+```tsx
+"use client";
+
+import { useState, type FormEvent } from "react";
+
+export default function StudentForm() {
+  const [name, setName] = useState("");
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    console.log("Submitted:", name);
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+`event.preventDefault()` prevents the browser's default form-submission navigation so this Client Component can handle the event. In a later lesson, we will submit data to a REST API and validate it with Zod.
+
+---
+
+### 6.5 — Understanding `useEffect()`
+
+`useEffect()` is for **synchronizing a component with something outside React**, such as:
+
+- Browser APIs (for example, updating the tab title).
+- Timers and intervals.
+- Event subscriptions.
+- Connections to external services.
+
+Basic syntax:
+
+```tsx
+useEffect(() => {
+  // Synchronize with an external system here.
+}, []);
+```
+
+#### Example: Update the browser tab title
+
+```tsx
+"use client";
+
+import { useState, useEffect } from "react";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    document.title = `Count: ${count}`;
+  }, [count]);
+
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button onClick={() => setCount((prev) => prev + 1)}>
+        Increment
+      </button>
+    </div>
+  );
+}
+```
+
+**What happens?**
+
+1. The component renders with the current `count`.
+2. The user clicks **Increment**.
+3. `setCount()` updates state and React renders again.
+4. After the update is committed, the effect synchronizes `document.title` with `count`.
+
+`document.title` is a browser API, so this synchronization belongs in a Client Component effect rather than directly in render logic.
+
+---
+
+### 6.6 — The `useEffect()` dependency array
+
+The array determines when React needs to run the effect again.
+
+#### Case 1: No dependency array
+
+```tsx
+useEffect(() => {
+  console.log("Effect executed");
+});
+```
+
+Runs after **every committed render**.
+
+#### Case 2: Empty dependency array
+
+```tsx
+useEffect(() => {
+  console.log("Component mounted");
+}, []);
+```
+
+Runs when the component mounts, without dependency-triggered reruns. In development, React Strict Mode may perform an extra setup/cleanup cycle.
+
+#### Case 3: Specific dependencies
+
+```tsx
+useEffect(() => {
+  console.log("Count changed:", count);
+}, [count]);
+```
+
+Runs after mounting and again when `count` changes.
+
+| Array | When effect runs |
+| --- | --- |
+| Omitted | After every committed render. |
+| `[]` | On mount; an extra development-only check may occur. |
+| `[count]` | On mount and when `count` changes. |
+| `[count, name]` | On mount and when either dependency changes. |
+
+**Rule:** Include all reactive values that the effect reads and depends upon. React's Hooks ESLint rules help catch missing dependencies.
+
+---
+
+### 6.7 — Cleanup functions
+
+Imagine a timer that increments every second.
+
+**File: `app/timer/page.tsx`**
+
+```tsx
+"use client";
+
+import { useState, useEffect } from "react";
+
+export default function Timer() {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSeconds((prev) => prev + 1);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  return <h1>Seconds: {seconds}</h1>;
+}
+```
+
+- `setInterval()` schedules repeated updates.
+- `clearInterval()` stops the timer.
+- React runs the cleanup when the component unmounts, and before rerunning an effect whose dependencies have changed.
+
+#### Why does the effect sometimes appear to run twice?
+
+In development with React Strict Mode, React may intentionally test this sequence:
+
+```text
+Effect setup
+    ↓
+Effect cleanup
+    ↓
+Effect setup again
+```
+
+This helps reveal effects that are missing cleanup. It is not the same as a production component mounting twice.
+
+---
+
+### 6.8 — Project: Interactive Student Search
+
+We will combine a Server Component with a Client Component using props and state.
+
+#### Folder structure
+
+```text
+app/
+└── hooks/
+    ├── page.tsx
+    └── StudentSearch.tsx
+```
+
+If you use a route group such as `(main)`, you may put `hooks` inside it; the URL is still `/hooks`.
+
+#### Step 1: Server Component
+
+**File: `app/hooks/page.tsx`**
+
+```tsx
+import StudentSearch from "./StudentSearch";
+
+const students = [
+  { id: 1, name: "Arun" },
+  { id: 2, name: "Rahul" },
+  { id: 3, name: "Anu" },
+  { id: 4, name: "Akhil" },
+  { id: 5, name: "Vishnu" },
+];
+
+export default function HooksPage() {
+  return (
+    <main>
+      <h1>Student Search</h1>
+      <StudentSearch students={students} />
+    </main>
+  );
+}
+```
+
+The page stays a **Server Component** and passes simple, serializable student data to a Client Component.
+
+#### Step 2: Client Component
+
+**File: `app/hooks/StudentSearch.tsx`**
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+type Student = {
+  id: number;
+  name: string;
+};
+
+export default function StudentSearch({
+  students,
+}: {
+  students: Student[];
+}) {
+  const [search, setSearch] = useState("");
+
+  const filteredStudents = students.filter((student) =>
+    student.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div>
+      <label htmlFor="student-search">Search students</label>
+      <input
+        id="student-search"
+        type="text"
+        placeholder="Search students..."
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+      />
+
+      <p>Found: {filteredStudents.length}</p>
+
+      {filteredStudents.map((student) => (
+        <p key={student.id}>{student.name}</p>
+      ))}
+    </div>
+  );
+}
+```
+
+#### How searching works
+
+When someone types `An`:
+
+```text
+User types "An"
+       ↓
+onChange runs
+       ↓
+setSearch("An") updates state
+       ↓
+React rerenders StudentSearch
+       ↓
+filteredStudents is recalculated
+       ↓
+Matching students are displayed
+```
+
+#### Why didn't we use `useEffect()` for filtering?
+
+Filtering is a calculation derived directly from the `students` prop and `search` state. It does not need to synchronize with an external system.
+
+**Key learning:** Prefer calculating derived values while rendering rather than copying them into separate state via an effect.
+
+---
+
+### 6.9 — Rules of Hooks and best practices
+
+#### Rule 1: Call hooks at the top level
+
+**Correct:**
+
+```tsx
+function Counter() {
+  const [count, setCount] = useState(0);
+  return <p>{count}</p>;
+}
+```
+
+**Incorrect:**
+
+```tsx
+function Counter() {
+  if (someCondition) {
+    const [count, setCount] = useState(0);
+  }
+  return <p>Counter</p>;
+}
+```
+
+Don't call hooks inside conditions, loops, or nested event handlers. Call them at the top level of a React function component or custom hook.
+
+#### Rule 2: Don't mutate state directly
+
+If `students` is a state array, avoid:
+
+```tsx
+students.push(newStudent);
+```
+
+Instead create a new array:
+
+```tsx
+setStudents((prev) => [...prev, newStudent]);
+```
+
+#### Rule 3: Don't use `useEffect()` for everything
+
+- A click should usually be handled by `onClick`.
+- A form submission should usually be handled by `onSubmit` (or a form action, in later lessons).
+- A filtered list derived from existing state can be computed during rendering.
+- An interval or browser subscription typically needs an effect with cleanup.
+
+#### Rule 4: Keep client boundaries focused
+
+If only part of the page needs `useState` or event handlers, keep the parent page as a Server Component and move the interactive part into its own Client Component.
+
+---
+
+### 6.10 — Quick revision
+
+| Concept | Remember |
+| --- | --- |
+| `useState()` | Stores state between renders. |
+| State setter | Requests an update and a rerender. |
+| Functional updater | Uses the pending previous state: `setCount(prev => prev + 1)`. |
+| `onClick` | Handles click events. |
+| `onChange` | Handles input changes. |
+| `onSubmit` | Handles form submission. |
+| Controlled input | Uses state as the source of its displayed value. |
+| `useEffect()` | Synchronizes with external systems. |
+| Dependency array | Determines when an effect needs to rerun. |
+| Cleanup | Undoes intervals, subscriptions, and similar work. |
+| `"use client"` | Enables client-side hooks and event handlers. |
+
+---
+
+### Practice quiz
+
+**1. What happens if we update a normal local variable in a React component?**
+
+A. React automatically rerenders.  
+B. The variable changes, but it doesn't trigger a rerender.  
+C. The entire browser refreshes.
+
+**2. Which approach is best when the next state depends on the previous state?**
+
+A. `setCount(prev => prev + 1)`  
+B. `count = count + 1`  
+C. `setCount = count + 1`
+
+**3. What does `useEffect(..., [count])` do?**
+
+A. Runs only once.  
+B. Runs only when the component unmounts.  
+C. Runs on mount and when `count` changes.
+
+**4. Why clear an interval in the effect's cleanup function?**
+
+A. To prevent a timer from continuing after it is no longer needed.  
+B. To restart the entire Next.js application.  
+C. To reset all React components.
+
+#### Answers
+
+1. **B** — A local variable change doesn't schedule a React rerender.
+2. **A** — Functional state updates use the pending previous value.
+3. **C** — The effect runs on mount and after dependency changes.
+4. **A** — Cleanup stops the timer when appropriate.
+
+---
+
+### Coding exercise — Extend Student Search
+
+Starting with the student search project from section 6.8, add:
+
+1. **Add Student:** An input and button that append a student to a state-managed student array.
+2. **Delete Student:** A button beside each student that removes that student from state.
+3. **Student Count:** Show the total student count and update it when students are added or removed.
+
+**Challenge:** Implement all three features using `useState`, derived values, and event handlers — **without `useEffect()`**.
+
+---
+
+---
+
+## Official reference links
+
+- [Next.js App Router — Installation](https://nextjs.org/docs/app/getting-started/installation)
+- [Next.js — Pages](https://nextjs.org/docs/app/api-reference/file-conventions/page)
+- [Next.js — Layouts](https://nextjs.org/docs/app/api-reference/file-conventions/layout)
+- [Next.js — Route Groups](https://nextjs.org/docs/app/api-reference/file-conventions/route-groups)
+- [Next.js — Dynamic Segments](https://nextjs.org/docs/app/api-reference/file-conventions/dynamic-routes)
+- [Next.js — `loading.tsx`](https://nextjs.org/docs/app/api-reference/file-conventions/loading)
+- [Next.js — Server and Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components)
+- [React — `useState`](https://react.dev/reference/react/useState)
+- [React — `useEffect`](https://react.dev/reference/react/useEffect)
+
+**Learning order:** Next up is *Lesson 7 — Data Fetching in Next.js*. After that: forms, Zod validation, REST API integration with NestJS, and database integration.

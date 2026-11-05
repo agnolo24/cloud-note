@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <div>
-      Hello coder
+      <div className="text-2xl">View students</div>
     </div>
   );
 }
