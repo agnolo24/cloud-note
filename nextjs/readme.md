@@ -1584,3 +1584,504 @@ app/
 6. What purpose does a Suspense boundary serve in the search example?
 
 ---
+
+# Next.js — Lesson 5: Server Components vs. Client Components
+
+> **Level:** Beginner to Intermediate  
+> **Project:** Next.js 16 (App Router)  
+> **Prerequisites:** Pages, layouts, dynamic routing, `loading.tsx`, and `searchParams`
+
+## What you'll learn
+
+1. What Server Components and Client Components are.
+2. Why Server Components are the default in the App Router.
+3. When and why to use `"use client"`.
+4. How React state and event handlers work in Client Components.
+5. How Server and Client Components work together.
+6. How to pass data from the server to a client component.
+7. What hydration means.
+8. Common mistakes and best practices.
+
+---
+
+## 5.1 — What are Server Components and Client Components?
+
+Next.js has two important types of React components:
+
+- **Server Components:** Render on the server. They're useful for accessing server-side data, fetching from databases, and producing non-interactive UI without sending that component's JavaScript to the browser.
+- **Client Components:** Support interactive behavior such as clicks, component state (`useState`), effects (`useEffect`), and browser APIs.
+
+**In Next.js App Router, components are Server Components by default.**
+
+```text
+                         NEXT.JS SERVER
+                  ┌────────────────────────┐
+                  │ Server Components      │
+                  │ - Fetch data           │
+                  │ - Query the database   │
+                  │ - Render page content  │
+                  └───────────┬────────────┘
+                              │
+                 HTML + React Server Component data
+                              │
+                              ▼
+                           BROWSER
+                  ┌────────────────────────┐
+                  │ Displays the page      │
+                  │                        │
+                  │ Client Components:     │
+                  │ - onClick              │
+                  │ - useState             │
+                  │ - useEffect            │
+                  └────────────────────────┘
+```
+
+> **Important:** A Client Component can still be *prerendered* to HTML on the server during the initial request. `"use client"` means the component participates in the client-side React application; it doesn't mean the component is only ever rendered in a browser.
+
+---
+
+## 5.2 — Understanding Server Components
+
+This is a Server Component because there is no `"use client"` directive:
+
+**File:** `app/page.tsx`
+
+```tsx
+export default function Home() {
+  return (
+    <div>
+      <h1>Welcome to Next.js</h1>
+      <p>This is my homepage.</p>
+    </div>
+  );
+}
+```
+
+### Example: Render student data
+
+**File:** `app/students/page.tsx`
+
+```tsx
+const students = [
+  { id: 1, name: "Arun" },
+  { id: 2, name: "Rahul" },
+  { id: 3, name: "Anu" },
+];
+
+export default function StudentsPage() {
+  return (
+    <main>
+      <h1>Students</h1>
+
+      {students.map((student) => (
+        <p key={student.id}>{student.name}</p>
+      ))}
+    </main>
+  );
+}
+```
+
+In a future database lesson, this could be replaced with a server-side PostgreSQL query using Drizzle ORM:
+
+```tsx
+// Illustration only; assumes db and studentsTable are configured.
+const students = await db.select().from(studentsTable);
+```
+
+### Why use Server Components?
+
+- They can query a database and call server-side services directly.
+- They can access private server environment variables; never render secrets into the page or send them as props.
+- Their component code isn't shipped as client-side JavaScript.
+- They're well suited to product listings, dashboards, reports, and other data-driven pages.
+
+### What can't you do directly in a Server Component?
+
+You cannot directly use browser-side interactive hooks or event handlers, such as:
+
+```tsx
+useState(0);                 // Not supported directly in a Server Component
+useEffect(() => {}, []);     // Not supported directly in a Server Component
+<button onClick={...}>       // Interactive handlers require a Client Component
+```
+
+For those, create a Client Component.
+
+---
+
+## 5.3 — Understanding Client Components
+
+Imagine a counter with **Increment** and **Decrement** buttons. Because the UI updates in response to clicks, we need `useState` and an event handler.
+
+**File:** `app/components/Counter.tsx`
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <h1>Counter: {count}</h1>
+
+      <button onClick={() => setCount(count + 1)}>
+        Increment
+      </button>
+
+      <button onClick={() => setCount(count - 1)}>
+        Decrement
+      </button>
+    </div>
+  );
+}
+```
+
+### Understand the code
+
+**1. `"use client"`**
+
+```tsx
+"use client";
+```
+
+- Put this directive at the **top of the file, before imports**.
+- It marks a boundary where the imported component and its module dependencies are part of the client-side module graph.
+- You don't need to repeat it in every component imported from an existing client boundary.
+
+**2. `useState`**
+
+```tsx
+const [count, setCount] = useState(0);
+```
+
+- `count`: Current state value.
+- `setCount`: Function used to update the value.
+- `0`: Initial state value.
+
+**3. `onClick`**
+
+```tsx
+<button onClick={() => setCount(count + 1)}>
+  Increment
+</button>
+```
+
+When clicked, React updates the component's state and rerenders it **without a full page reload**.
+
+### What happens if you remove `"use client"`?
+
+If this component is treated as a Server Component, Next.js reports an error because `useState` needs a Client Component. Restore `"use client"` to enable its interactive functionality.
+
+---
+
+## 5.4 — Server vs. Client Components: Comparison
+
+| Feature | Server Component | Client Component |
+|---|---|---|
+| Render JSX | Yes | Yes |
+| Fetch data | Yes | Yes |
+| Query database directly | Yes | No; use a server endpoint/function |
+| Access server-only secrets | Yes, with care | No |
+| `useState` | No | Yes |
+| `useEffect` | No | Yes |
+| Browser event handlers (`onClick`, `onChange`) | No | Yes |
+| Browser APIs (`localStorage`, `window`) | No | Yes, after running in browser |
+| `async` component function | Yes | Generally not supported |
+| Requires `"use client"` | No | Yes, at the client boundary |
+
+> **Note:** Client Components may be prerendered on the server. Code that accesses `window` or `localStorage` should run in browser-only effects/event handlers or be guarded appropriately.
+
+---
+
+## 5.5 — Can a Server Component render a Client Component?
+
+**Yes. This is one of the most common Next.js patterns.** Keep the overall page on the server and make only the interactive parts Client Components.
+
+**File structure:**
+
+```text
+app/
+├── page.tsx
+└── components/
+    └── Counter.tsx
+```
+
+**File:** `app/page.tsx` (Server Component)
+
+```tsx
+import Counter from "./components/Counter";
+
+export default function Home() {
+  return (
+    <main>
+      <h1>Welcome to Next.js</h1>
+      <p>This content is rendered on the server.</p>
+      <Counter />
+    </main>
+  );
+}
+```
+
+**File:** `app/components/Counter.tsx` (Client Component)
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <button onClick={() => setCount((previous) => previous + 1)}>
+      Count: {count}
+    </button>
+  );
+}
+```
+
+**Rendering relationship:**
+
+```text
+Home (Server Component)
+├── <h1>Welcome to Next.js</h1>
+├── <p>This content is rendered on the server.</p>
+└── Counter (Client Component)
+    └── Interactive button with useState
+```
+
+### Important boundary rule
+
+- A **Server Component can import and render a Client Component**.
+- When a file has `"use client"`, its imports are included in the client module graph, so don't import server-only database modules into that file.
+- Advanced pattern: You can pass server-rendered content as `children` or other React element props into a Client Component rather than importing server-only code directly inside it.
+
+---
+
+## 5.6 — Passing data from Server to Client Components
+
+We often fetch data on the server, then pass individual data values to interactive Client Components through **props**.
+
+### Step 1 — Create a Client Component
+
+**File:** `app/students/StudentCard.tsx`
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+type StudentCardProps = {
+  id: number;
+  name: string;
+};
+
+export default function StudentCard({
+  id,
+  name,
+}: StudentCardProps) {
+  const [selected, setSelected] = useState(false);
+
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>Student ID: {id}</p>
+
+      <button onClick={() => setSelected(!selected)}>
+        {selected ? "Selected" : "Select"}
+      </button>
+    </div>
+  );
+}
+```
+
+Here:
+
+- `id` and `name` are received as **props**.
+- `selected` is local Client Component **state**.
+- Clicking the button updates the local state; it does not modify server data.
+
+### Step 2 — Pass data from a Server Component
+
+**File:** `app/students/page.tsx`
+
+```tsx
+import StudentCard from "./StudentCard";
+
+const students = [
+  { id: 1, name: "Arun" },
+  { id: 2, name: "Rahul" },
+  { id: 3, name: "Anu" },
+];
+
+export default function StudentsPage() {
+  return (
+    <main>
+      <h1>Students List</h1>
+
+      {students.map((student) => (
+        <StudentCard
+          key={student.id}
+          id={student.id}
+          name={student.name}
+        />
+      ))}
+    </main>
+  );
+}
+```
+
+**Flow of data:**
+
+```text
+StudentsPage (Server Component)
+       │
+       │ Provides id and name props
+       ▼
+StudentCard (Client Component)
+       │
+       ├── Displays student information
+       └── Uses useState for the Select button
+```
+
+### Rules for passing props
+
+- Props crossing from Server to Client Components must be **serializable by React**.
+- Simple strings, numbers, arrays, and plain data objects are typical choices.
+- An ordinary JavaScript callback such as `onClick={() => ...}` cannot be passed directly from a Server Component to a Client Component across this boundary. Server Functions are a special case we'll cover later.
+- State maintained with `useState` is temporary and resets on a fresh page load unless you persist it separately.
+
+---
+
+## 5.7 — What is hydration?
+
+When a page initially loads, Next.js can send HTML to the browser so content appears quickly. But plain HTML doesn't know how to execute React click handlers.
+
+**Hydration** is the process where React attaches interactive behavior to the prerendered Client Component markup in the browser.
+
+```text
+1. Server prepares the initial HTML
+                 │
+                 ▼
+2. Browser displays the HTML
+                 │
+                 ▼
+3. Client JavaScript loads
+                 │
+                 ▼
+4. React hydrates Client Components
+                 │
+                 ▼
+5. Buttons, state, and interactions work
+```
+
+### Why this matters
+
+- Users can see content before all client JavaScript finishes loading.
+- Client Components gain React-powered interactivity during hydration.
+- Server Components themselves do **not** hydrate like Client Components because their component JavaScript isn't sent to the browser.
+
+---
+
+## 5.8 — Common mistakes
+
+### Mistake 1: Adding `"use client"` everywhere
+
+**Better:** Use Server Components by default. Add a Client Component only for interactive or browser-dependent parts.
+
+### Mistake 2: Calling `useState` inside a Server Component
+
+**Better:** Move that stateful logic to a Client Component.
+
+### Mistake 3: Importing database code in a Client Component
+
+**Better:** Query the database on the server, then pass safe data as props, or call a server endpoint/function.
+
+### Mistake 4: Assuming `"use client"` means browser-only rendering
+
+**Better:** Remember that Client Components can also have HTML prerendered on the server. Browser-only APIs must be used carefully.
+
+### Mistake 5: Adding `"use server"` to every Server Component
+
+**Better:** Don't do this. **Server Components are the default.** `"use server"` is for Server Functions (which we'll study when learning forms and mutations).
+
+---
+
+## 5.9 — Quick revision
+
+| Concept | Remember |
+|---|---|
+| Server Component | Default component type in App Router |
+| Client Component | Supports interactive React and browser-side behavior |
+| `"use client"` | Creates a client module boundary |
+| `useState` | Stores local state in a Client Component |
+| `useEffect` | Handles effects in a Client Component |
+| Props | Pass data between components |
+| Hydration | Adds React interactivity to prerendered Client Components |
+| `"use server"` | Marks Server Functions; not required for Server Components |
+
+### Simple decision rule
+
+```text
+Does the component need browser events, state, effects, or browser APIs?
+  ├── Yes → Use a Client Component ("use client")
+  └── No  → Prefer a Server Component (default)
+```
+
+---
+
+## 5.10 — Practice quiz
+
+**1. What is the default component type in the App Router?**
+
+A. Client Component  
+B. Server Component  
+C. Both automatically
+
+**2. Which feature requires a Client Component?**
+
+A. Rendering a heading  
+B. Using `useState` for a counter  
+C. Querying a database directly
+
+**3. Can a Server Component render a Client Component?**
+
+A. Yes  
+B. No  
+C. Only inside `layout.tsx`
+
+**4. What does hydration do?**
+
+A. Queries PostgreSQL  
+B. Makes prerendered Client Components interactive  
+C. Creates URL routes
+
+**Answers:** 1-B, 2-B, 3-A, 4-B.
+
+---
+
+## 5.11 — Coding exercise
+
+Build the student selection example yourself:
+
+1. Create `app/students/StudentCard.tsx` and add `"use client"`.
+2. Add `useState` to track whether a student has been selected.
+3. Create `app/students/page.tsx` as a Server Component.
+4. Pass each student's `id` and `name` as props to `StudentCard`.
+5. Confirm clicking **Select** changes only that student's card without refreshing the page.
+6. **Extra challenge:** Add a Reset button that sets `selected` back to `false`.
+
+### Expected folder structure
+
+```text
+app/
+└── students/
+    ├── page.tsx         # Server Component
+    └── StudentCard.tsx  # Client Component
+```
+
+---
+
