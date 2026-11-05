@@ -2085,3 +2085,630 @@ app/
 
 ---
 
+# Next.js — Lesson 6: React Hooks
+
+> **Level:** Beginner → Intermediate  
+> **Prerequisite:** Lesson 5 — Server Components vs. Client Components  
+> **Focus:** `useState`, event handlers, `useEffect`, cleanup, and practical state management
+
+## What we will learn
+
+1. What React Hooks are.
+2. Why `useState()` is needed and how it works.
+3. Updating state using previous values.
+4. Handling `onClick`, `onChange`, and `onSubmit` events.
+5. Understanding `useEffect()` and dependency arrays.
+6. Cleaning up effects and understanding Strict Mode.
+7. Building a student-search application using Server and Client Components.
+8. Rules of Hooks and common mistakes.
+
+---
+
+## 6.1 — What are React Hooks?
+
+**React Hooks** are functions that let React components use features such as state, effects, references, and shared context.
+
+| Hook | Purpose |
+| --- | --- |
+| `useState` | Store and update a component's state. |
+| `useEffect` | Synchronize the component with an external system. |
+| `useRef` | Keep a mutable value between renders, or access a DOM element, without triggering a rerender. |
+| `useContext` | Read values provided by React context. |
+| `useReducer` | Manage more complex state updates. |
+| `useMemo` | Cache the result of a calculation. |
+
+This lesson focuses on **`useState` and `useEffect`**.
+
+**Next.js reminder:** In the App Router, components are Server Components by default. To use interactive hooks such as `useState` and `useEffect`, make the component a Client Component using `"use client"`, or put it inside an existing client boundary.
+
+---
+
+## 6.2 — Why do we need `useState()`?
+
+A normal JavaScript variable does not tell React to update the displayed UI.
+
+### Example: A normal variable (incorrect for UI state)
+
+```tsx
+"use client";
+
+export default function Counter() {
+  let count = 0;
+
+  function increment() {
+    count++;
+    console.log(count);
+  }
+
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+```
+
+Clicking the button changes the local variable inside the event handler, but **does not trigger a React rerender**. Local variables also reset when the component function executes on a later render.
+
+### Solution: Store the value in React state
+
+**File: `app/counter/page.tsx`**
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  function increment() {
+    setCount(count + 1);
+  }
+
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+```
+
+### Understanding the syntax
+
+```tsx
+const [count, setCount] = useState(0);
+```
+
+| Part | Meaning |
+| --- | --- |
+| `count` | The current state value. |
+| `setCount` | Function that requests a state update. |
+| `useState(0)` | Sets the initial value to `0`. |
+
+React stores the state between renders of the same mounted component. Calling a setter schedules a new render with the updated state.
+
+**Render sequence:**
+
+```text
+Initial render: count = 0
+        ↓
+User clicks Increment
+        ↓
+setCount(count + 1)
+        ↓
+React rerenders the component
+        ↓
+UI displays: Count: 1
+```
+
+---
+
+## 6.3 — Updating state using its previous value
+
+There are two common approaches:
+
+```tsx
+// Directly calculate from the value in this render
+setCount(count + 1);
+
+// Calculate from the pending previous state
+setCount((prev) => prev + 1);
+```
+
+Both work for a simple click. **Prefer the functional updater when the next value depends on the previous value.**
+
+### Example: Increment three times
+
+This code does **not** reliably add three because each call uses the same captured `count`:
+
+```tsx
+function incrementThreeTimes() {
+  setCount(count + 1);
+  setCount(count + 1);
+  setCount(count + 1);
+}
+```
+
+Use functional updates instead:
+
+```tsx
+function incrementThreeTimes() {
+  setCount((prev) => prev + 1);
+  setCount((prev) => prev + 1);
+  setCount((prev) => prev + 1);
+}
+```
+
+If the starting value is `0`, React applies these updates as `0 → 1 → 2 → 3`.
+
+---
+
+## 6.4 — Event handling in React
+
+An **event handler** is a function React calls in response to a user interaction.
+
+| Event | Typical use |
+| --- | --- |
+| `onClick` | Clicking a button. |
+| `onChange` | Editing an input. |
+| `onSubmit` | Submitting a form. |
+| `onKeyDown` | Pressing a key. |
+| `onFocus` | Focusing an input. |
+| `onBlur` | Leaving an input. |
+
+### Example 1: `onClick`
+
+```tsx
+"use client";
+
+export default function Button() {
+  function handleClick() {
+    alert("Button clicked!");
+  }
+
+  return <button onClick={handleClick}>Click Me</button>;
+}
+```
+
+**Remember:** `onClick={handleClick}` passes a function. `onClick={handleClick()}` calls it during rendering and is usually incorrect.
+
+### Example 2: `onChange` and controlled inputs
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+export default function NameInput() {
+  const [name, setName] = useState("");
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+      />
+
+      <p>Your name: {name}</p>
+    </div>
+  );
+}
+```
+
+- `value={name}` controls the input's displayed value.
+- `onChange` runs when the user changes the input.
+- `event.target.value` reads the latest text.
+- `setName()` updates state and causes the component to rerender.
+
+This is called a **controlled input**.
+
+### Example 3: `onSubmit`
+
+```tsx
+"use client";
+
+import { useState, type FormEvent } from "react";
+
+export default function StudentForm() {
+  const [name, setName] = useState("");
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    console.log("Submitted:", name);
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+`event.preventDefault()` prevents the browser's default form-submission navigation so this Client Component can handle the event. In a later lesson, we will submit data to a REST API and validate it with Zod.
+
+---
+
+## 6.5 — Understanding `useEffect()`
+
+`useEffect()` is for **synchronizing a component with something outside React**, such as:
+
+- Browser APIs (for example, updating the tab title).
+- Timers and intervals.
+- Event subscriptions.
+- Connections to external services.
+
+Basic syntax:
+
+```tsx
+useEffect(() => {
+  // Synchronize with an external system here.
+}, []);
+```
+
+### Example: Update the browser tab title
+
+```tsx
+"use client";
+
+import { useState, useEffect } from "react";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    document.title = `Count: ${count}`;
+  }, [count]);
+
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button onClick={() => setCount((prev) => prev + 1)}>
+        Increment
+      </button>
+    </div>
+  );
+}
+```
+
+**What happens?**
+
+1. The component renders with the current `count`.
+2. The user clicks **Increment**.
+3. `setCount()` updates state and React renders again.
+4. After the update is committed, the effect synchronizes `document.title` with `count`.
+
+`document.title` is a browser API, so this synchronization belongs in a Client Component effect rather than directly in render logic.
+
+---
+
+## 6.6 — The `useEffect()` dependency array
+
+The array determines when React needs to run the effect again.
+
+### Case 1: No dependency array
+
+```tsx
+useEffect(() => {
+  console.log("Effect executed");
+});
+```
+
+Runs after **every committed render**.
+
+### Case 2: Empty dependency array
+
+```tsx
+useEffect(() => {
+  console.log("Component mounted");
+}, []);
+```
+
+Runs when the component mounts, without dependency-triggered reruns. In development, React Strict Mode may perform an extra setup/cleanup cycle.
+
+### Case 3: Specific dependencies
+
+```tsx
+useEffect(() => {
+  console.log("Count changed:", count);
+}, [count]);
+```
+
+Runs after mounting and again when `count` changes.
+
+| Array | When effect runs |
+| --- | --- |
+| Omitted | After every committed render. |
+| `[]` | On mount; an extra development-only check may occur. |
+| `[count]` | On mount and when `count` changes. |
+| `[count, name]` | On mount and when either dependency changes. |
+
+**Rule:** Include all reactive values that the effect reads and depends upon. React's Hooks ESLint rules help catch missing dependencies.
+
+---
+
+## 6.7 — Cleanup functions
+
+Imagine a timer that increments every second.
+
+**File: `app/timer/page.tsx`**
+
+```tsx
+"use client";
+
+import { useState, useEffect } from "react";
+
+export default function Timer() {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSeconds((prev) => prev + 1);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  return <h1>Seconds: {seconds}</h1>;
+}
+```
+
+- `setInterval()` schedules repeated updates.
+- `clearInterval()` stops the timer.
+- React runs the cleanup when the component unmounts, and before rerunning an effect whose dependencies have changed.
+
+### Why does the effect sometimes appear to run twice?
+
+In development with React Strict Mode, React may intentionally test this sequence:
+
+```text
+Effect setup
+    ↓
+Effect cleanup
+    ↓
+Effect setup again
+```
+
+This helps reveal effects that are missing cleanup. It is not the same as a production component mounting twice.
+
+---
+
+## 6.8 — Project: Interactive Student Search
+
+We will combine a Server Component with a Client Component using props and state.
+
+### Folder structure
+
+```text
+app/
+└── hooks/
+    ├── page.tsx
+    └── StudentSearch.tsx
+```
+
+If you use a route group such as `(main)`, you may put `hooks` inside it; the URL is still `/hooks`.
+
+### Step 1: Server Component
+
+**File: `app/hooks/page.tsx`**
+
+```tsx
+import StudentSearch from "./StudentSearch";
+
+const students = [
+  { id: 1, name: "Arun" },
+  { id: 2, name: "Rahul" },
+  { id: 3, name: "Anu" },
+  { id: 4, name: "Akhil" },
+  { id: 5, name: "Vishnu" },
+];
+
+export default function HooksPage() {
+  return (
+    <main>
+      <h1>Student Search</h1>
+      <StudentSearch students={students} />
+    </main>
+  );
+}
+```
+
+The page stays a **Server Component** and passes simple, serializable student data to a Client Component.
+
+### Step 2: Client Component
+
+**File: `app/hooks/StudentSearch.tsx`**
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+type Student = {
+  id: number;
+  name: string;
+};
+
+export default function StudentSearch({
+  students,
+}: {
+  students: Student[];
+}) {
+  const [search, setSearch] = useState("");
+
+  const filteredStudents = students.filter((student) =>
+    student.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="Search students..."
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+      />
+
+      <p>Found: {filteredStudents.length}</p>
+
+      {filteredStudents.map((student) => (
+        <p key={student.id}>{student.name}</p>
+      ))}
+    </div>
+  );
+}
+```
+
+### How searching works
+
+When someone types `An`:
+
+```text
+User types "An"
+       ↓
+onChange runs
+       ↓
+setSearch("An") updates state
+       ↓
+React rerenders StudentSearch
+       ↓
+filteredStudents is recalculated
+       ↓
+Matching students are displayed
+```
+
+### Why didn't we use `useEffect()` for filtering?
+
+Filtering is a calculation derived directly from the `students` prop and `search` state. It does not need to synchronize with an external system.
+
+**Key learning:** Prefer calculating derived values while rendering rather than copying them into separate state via an effect.
+
+---
+
+## 6.9 — Rules of Hooks and best practices
+
+### Rule 1: Call hooks at the top level
+
+**Correct:**
+
+```tsx
+function Counter() {
+  const [count, setCount] = useState(0);
+  return <p>{count}</p>;
+}
+```
+
+**Incorrect:**
+
+```tsx
+function Counter() {
+  if (someCondition) {
+    const [count, setCount] = useState(0);
+  }
+  return <p>Counter</p>;
+}
+```
+
+Don't call hooks inside conditions, loops, or nested event handlers. Call them at the top level of a React function component or custom hook.
+
+### Rule 2: Don't mutate state directly
+
+If `students` is a state array, avoid:
+
+```tsx
+students.push(newStudent);
+```
+
+Instead create a new array:
+
+```tsx
+setStudents((prev) => [...prev, newStudent]);
+```
+
+### Rule 3: Don't use `useEffect()` for everything
+
+- A click should usually be handled by `onClick`.
+- A form submission should usually be handled by `onSubmit` (or a form action, in later lessons).
+- A filtered list derived from existing state can be computed during rendering.
+- An interval or browser subscription typically needs an effect with cleanup.
+
+### Rule 4: Keep client boundaries focused
+
+If only part of the page needs `useState` or event handlers, keep the parent page as a Server Component and move the interactive part into its own Client Component.
+
+---
+
+## 6.10 — Quick revision
+
+| Concept | Remember |
+| --- | --- |
+| `useState()` | Stores state between renders. |
+| State setter | Requests an update and a rerender. |
+| Functional updater | Uses the pending previous state: `setCount(prev => prev + 1)`. |
+| `onClick` | Handles click events. |
+| `onChange` | Handles input changes. |
+| `onSubmit` | Handles form submission. |
+| Controlled input | Uses state as the source of its displayed value. |
+| `useEffect()` | Synchronizes with external systems. |
+| Dependency array | Determines when an effect needs to rerun. |
+| Cleanup | Undoes intervals, subscriptions, and similar work. |
+| `"use client"` | Enables client-side hooks and event handlers. |
+
+---
+
+## Practice quiz
+
+**1. What happens if we update a normal local variable in a React component?**
+
+A. React automatically rerenders.  
+B. The variable changes, but it doesn't trigger a rerender.  
+C. The entire browser refreshes.
+
+**2. Which approach is best when the next state depends on the previous state?**
+
+A. `setCount(prev => prev + 1)`  
+B. `count = count + 1`  
+C. `setCount = count + 1`
+
+**3. What does `useEffect(..., [count])` do?**
+
+A. Runs only once.  
+B. Runs only when the component unmounts.  
+C. Runs on mount and when `count` changes.
+
+**4. Why clear an interval in the effect's cleanup function?**
+
+A. To prevent a timer from continuing after it is no longer needed.  
+B. To restart the entire Next.js application.  
+C. To reset all React components.
+
+### Answers
+
+1. **B** — A local variable change doesn't schedule a React rerender.
+2. **A** — Functional state updates use the pending previous value.
+3. **C** — The effect runs on mount and after dependency changes.
+4. **A** — Cleanup stops the timer when appropriate.
+
+---
+
+## Coding exercise — Extend Student Search
+
+Starting with the student search project from section 6.8, add:
+
+1. **Add Student:** An input and button that append a student to a state-managed student array.
+2. **Delete Student:** A button beside each student that removes that student from state.
+3. **Student Count:** Show the total student count and update it when students are added or removed.
+
+**Challenge:** Implement all three features using `useState`, derived values, and event handlers — **without `useEffect()`**.
+
+---
