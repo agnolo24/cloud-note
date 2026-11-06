@@ -8,7 +8,7 @@
 
 #### Example of an Algorithm & Its Essential Properties
 
-An algorithm is **not** programming language code[4]. It is a sequence of computational tasks written in plain language or pseudocode, completely independent of any programming language
+An algorithm is **not** programming language code. It is a sequence of computational tasks written in plain language or pseudocode, completely independent of any programming language
 
 **Characteristics / properties of a Good Algorithm**
 1. **Input**: Must have 0 or more (a finite number of) inputs
@@ -126,7 +126,7 @@ end
 
 
 
-#### A Survey of Common Running Times**
+#### A Survey of Common Running Times
 
 The running time of an algorithm is represented as a function $T(n)$, where $n$ is the input size. Time complexity measures the number of operations executed rather than clock time, ensuring hardware independence
 
@@ -166,7 +166,7 @@ The standard orders of running time growth are:
 
 ---
 
-**1.5 Analysis & Complexity of Algorithm**
+#### Analysis & Complexity of Algorithm**
 
 The term **"Analysis of Algorithms"** was introduced by **Donald Knuth**. It evaluates an algorithm's efficiency based on two main parameters:
 
