@@ -203,173 +203,131 @@ Horner's Rule parenthesizes the polynomial to factor out $x$ at each step: $$P(x
 
 **Pseudocode for Horner's Rule:**
 
-````
+```
 Algorithm Evaluate_Horner(A, n, x)
-/* Input: Array A[0..n] containing coefficients of polynomial of degree n, point x
+/* Input: Array A[0..n] of coefficients of degree n polynomial, evaluation point x
    Output: Value of polynomial at point x */
 
-p = A[n];                       // Initialize with leading coefficient
-for i = n-1 down to 0 do
-    p = p * x + A[i];           // 1 multiplication + 1 addition per step
-return p;
-``` [13, 14]
+p = A[n];                       // Step 1: Initialize with leading coefficient
+for i = n-1 down to 0 do        // Step 2: Loop n times
+    p = p * x + A[i];           // 1 multiplication + 1 addition per pass
+return p;                       // Step 3: Return result
+```
 
----
+- **Multiplication Count:** Exactly $1$ multiplication per loop iteration.
+- **Total Multiplications:** $T(n) = \sum_{i=1}^n 1 = n \implies \mathbf{O(n)}$.
 
-#### **Worked Trace Examples & Solved Problems (Horner's Rule)**
 
-* **Example 1: Evaluate \\(P(x) = 3x^2 + 5x + 6\\) at \\(x = 3\\)** [14]
-  * **Nested Form:** \\(P(x) = (3x + 5)x + 6\\) [14]
-  * **Step 1:** Initial assignment \\(p = a[15] = 3\\) [14].
-  * **Iteration 1 (\\(i=1\\)):** \\(p = (3 \times 3) + 5 = 9 + 5 = 14\\) [14].
-  * **Iteration 2 (\\(i=0\\)):** \\(p = (14 \times 3) + 6 = 42 + 6 = \mathbf{48}\\) [14].
+**3.4.3 Matrix Multiplication (Order** $n \times n$**)**
 
-* **Check Your Progress 1 (Q2): Evaluate \\(P(x) = 3x^4 + 2x^3 - 5x + 7\\) at \\(x = 2\\) using Horner's Rule** [6, 12]
-  * **Degree \\(n = 4\\).** Coefficient array \\(A = [a_0, a_1, a_2, a_3, a_4] = [7, -5, 0, 2, 3]\\) [6].
-  * **Initial:** \\(p = A[16] = 3\\) [6].
-  * **Iteration 1 (\\(i=3\\)):** \\(p = (2 \times 3) + A[17] = 6 + 2 = 8\\) [6].
-  * **Iteration 2 (\\(i=2\\)):** \\(p = (2 \times 8) + A[15] = 16 + 0 = 16\\) [6].
-  * **Iteration 3 (\\(i=1\\)):** \\(p = (2 \times 16) + A[18] = 32 + (-5) = 27\\) [6].
-  * **Iteration 4 (\\(i=0\\)):** \\(p = (2 \times 27) + A = 54 + 7 = \mathbf{61}\\) [6].
+Multiplying two $n \times n$ matrices $A$ and $B$ to produce matrix $C$:
 
----
-
-### **3.4.3 Matrix Multiplication (Order \\(n \times n\\))**
-
-Multiplying two square matrices \\(A_{n \times n}\\) and \\(B_{n \times n}\\) to yield product matrix \\(C_{n \times n}\\) [19]:
-
-#### **C Program Code Structure:**
-```c
-for (i = 0; i < n; i++) {                 // Outer loop: O(n)
-    for (j = 0; j < n; j++) {             // Middle loop: O(n)
-        c[i][j] = 0;                      // O(1)
-        for (k = 0; k < n; k++) {         // Inner loop: O(n)
-            c[i][j] = c[i][j] + a[i][k] * b[k][j]; // O(1) constant work
+```
+for (i = 0; i < n; i++) {                 // Outer loop: n iterations
+    for (j = 0; j < n; j++) {             // Middle loop: n iterations
+        c[i][j] = 0;
+        for (k = 0; k < n; k++) {         // Inner loop: n iterations
+            c[i][j] = c[i][j] + a[i][k] * b[k][j]; // 1 multiplication + 1 addition
         }
     }
 }
-``` [20-22]
+```
 
-#### **Complexity Analysis:**
-* Outer loop runs \\(n\\) times [20].
-* Middle loop runs \\(n\\) times [20].
-* Inner loop runs \\(n\\) times, performing 1 multiplication, 1 addition, and 1 assignment per iteration [21].
-* **Total Time Complexity:** \\(n \times n \times n = \mathbf{O(n^3)}\\) [21, 23].
+- **Complexity Analysis:** Three nested loops, each running $n$ times.
+- **Total Time Complexity:** $n \times n \times n = \mathbf{O(n^3)}$.
 
 ---
 
-### **3.4.4 Exponent Evaluation (Binary Exponentiation)**
+**3.4.4 Exponent Evaluation (Binary Exponentiation)**
 
-Evaluating \\(a^n\\) via brute-force multiplying \\(a\\) by itself takes \\(n-1\\) multiplications (\\(O(n)\\)) [24, 25]. 
-To speed this up for cryptographic applications, **Binary Exponentiation** splits exponent \\(n\\) into its binary representation of length \\(s = \lfloor \log_2 n \rfloor + 1\\) bits, achieving **\\(O(\log_2 n)\\) complexity** [24, 26, 27].
+To compute $a^n$, brute-force multiplication takes $n-1$ multiplications ($O(n)$). **Binary Exponentiation** converts $n$ into binary representation of length $s = \lfloor \log_2 n \rfloor + 1$ bits, reducing complexity to $O(\log_2 n)$
 
----
+**1. Left-to-Right Binary Exponentiation**
 
-#### **1. Left-to-Right Binary Exponentiation**
-Processes bits of exponent \\(n\\) from **Most Significant Bit (MSB)** down to **Least Significant Bit (LSB)** [28].
+Processes exponent bits from Most Significant Bit (MSB) to Least Significant Bit (LSB).
 
-```text
+```
 Algorithm Left_To_Right_Exponentiation(A, s, a)
-/* Input: Array A[s] storing binary representation of exponent n, base a
-   Output: a^n */
-
 result = a;
 for i = s-2 down to 0 do
     result = result * result;         // Square current value
     if A[i] == 1 then
-        result = result * a;          // Multiply by base 'a' if bit is 1
+        result = result * a;          // Multiply by base a if bit is 1
 return result;
-``` [28]
+```
 
-* **Trace Example: Compute \\(a^{17}\\)** [28, 29]
-  * Exponent \\(n = 17 = 10001_2\\), string length \\(s = 5\\) bits (\\(A[16]=1, A[17]=0, A[15]=0, A[18]=0, A=1\\)) [28].
-  * **Initial:** `result = a` [28, 29].
-  * **Iteration 1 (\\(i=3\\), bit \\(0\\)):** `result` \\(= a \cdot a = a^2\\) [29].
-  * **Iteration 2 (\\(i=2\\), bit \\(0\\)):** `result` \\(= a^2 \cdot a^2 = a^4\\) [29].
-  * **Iteration 3 (\\(i=1\\), bit \\(0\\)):** `result` \\(= a^4 \cdot a^4 = a^8\\) [29].
-  * **Iteration 4 (\\(i=0\\), bit \\(1\\)):** `result` \\(= a^8 \cdot a^8 = a^{16}\\); since bit is \\(1\\), `result` \\(= a^{16} \cdot a = \mathbf{a^{17}}\\) [29].
-  * **Total Multiplications:** **5** (instead of 16 in brute force) [29].
+**2. Right-to-Left Binary Exponentiation**
 
----
+Processes exponent bits from LSB to MSB.
 
-#### **2. Right-to-Left Binary Exponentiation**
-Processes bits of exponent \\(n\\) from **LSB** up to **MSB** [27].
-
-```text
+```
 Algorithm Right_To_Left_Exponentiation(A, s, a)
-/* Input: Array A[s] storing binary representation of exponent n, base a
-   Output: a^n */
-
 x = a;
 if A == 1 then result = a else result = 1;
-
 for i = 1 to s-1 do
     x = x * x;                        // Square base power
     if A[i] == 1 then
-        result = result * x;          // Accumulate into result if bit is 1
+        result = result * x;          // Accumulate if bit is 1
 return result;
-``` [27, 30]
+```
 
 ---
 
-#### **Check Your Progress 3 (Q1): Trace \\(a^{283}\\) for both methods** [22, 31, 32]
-Exponent \\(n = 283 = 100011011_2\\), string length \\(s = 9\\) bits [22, 32].
+**Worked Trace Problem (Check Your Progress 3, Q1): Trace** $a^{283}$
 
-##### **A. Left-to-Right Trace for \\(a^{283}\\):**
+Exponent $n = 283 = 100011011_2$, binary length $s = 9$ bits.
 
-| Iteration | Bit Index (\\(i\\)) | Bit Value | Operations & Intermediate `result` |
-| :---: | :---: | :---: | :--- |
-| **Init** | 8 | 1 | `result = a` [22] |
-| **1** | 7 | 0 | `(a)^2 = a^2` [22] |
-| **2** | 6 | 0 | `(a^2)^2 = a^4` [22] |
-| **3** | 5 | 0 | `(a^4)^2 = a^8` [22] |
-| **4** | 4 | 1 | `(a^8)^2 * a = a^{17}` [22] |
-| **5** | 3 | 1 | `(a^{17})^2 * a = a^{35}` [32] |
-| **6** | 2 | 0 | `(a^{35})^2 = a^{70}` [32] |
-| **7** | 1 | 1 | `(a^{70})^2 * a = a^{141}` [32] |
-| **8** | 0 | 1 | `(a^{141})^2 * a = \mathbf{a^{283}}` [32] |
+- **Left-to-Right Trace (**$a^{283}$**):**
 
-##### **B. Right-to-Left Trace for \\(a^{283}\\):**
+| Iteration | Bit Index ($i$) | Bit Value ($A[i]$) | Operation & `result` State        |
+| --------- | --------------- | ------------------ | --------------------------------- |
+| **Init**  | $8$             | $1$                | `result` $= a$                    |
+| **1**     | $7$             | $0$                | $(a)^2 =$ $a^2$                   |
+| **2**     | $6$             | $0$                | $(a^2)^2 =$ $a^4$                 |
+| **3**     | $5$             | $0$                | $(a^4)^2 =$ $a^8$                 |
+| **4**     | $4$             | $1$                | $(a^8)^2 \cdot a =$ $a^{17}$      |
+| **5**     | $3$             | $1$                | $(a^{17})^2 \cdot a =$ $a^{35}$   |
+| **6**     | $2$             | $0$                | $(a^{35})^2 =$ $a^{70}$           |
+| **7**     | $1$             | $1$                | $(a^{70})^2 \cdot a =$ $a^{141}$  |
+| **8**     | $0$             | $1$                | $(a^{141})^2 \cdot a =$ $a^{283}$ |
 
-| Iteration | Bit Index (\\(i\\)) | Bit Value | Power Value (\\(x\\)) | Accumulated `result` |
-| :---: | :---: | :---: | :---: | :--- |
-| **Init** | 0 | 1 | \\(a\\) | `result = a` (since \\(A=1\\)) [32] |
-| **1** | 1 | 1 | \\(a^2\\) | `a * a^2 = a^3` [32] |
-| **2** | 2 | 0 | \\(a^4\\) | `a^3` [32] |
-| **3** | 3 | 1 | \\(a^8\\) | `a^3 * a^8 = a^{11}` [32] |
-| **4** | 4 | 1 | \\(a^{16}\\) | `a^{11} * a^{16} = a^{27}` [32] |
-| **5** | 5 | 0 | \\(a^{32}\\) | `a^{27}` [32] |
-| **6** | 6 | 0 | \\(a^{64}\\) | `a^{27}` [32] |
-| **7** | 7 | 0 | \\(a^{128}\\) | `a^{27}` [32] |
-| **8** | 8 | 1 | \\(a^{256}\\) | `a^{27} * a^{256} = \mathbf{a^{283}}` [32] |
+- **Right-to-Left Trace (**$a^{283}$**):**
 
-* **Complexity bound for both methods:** \\(s - 1 \le \text{multiplications} \le 2(s - 1) \implies \mathbf{O(\log_2 n)}\\) [27, 31, 33].
+| Iteration | Bit Index ($i$) | Bit Value ($A[i]$) | Power ($x$) | Accumulated `result`               |
+| --------- | --------------- | ------------------ | ----------- | ---------------------------------- |
+| **Init**  | $0$             | $1$                | $a$         | `result` $= a$                     |
+| **1**     | $1$             | $1$                | $a^2$       | $a \cdot a^2 =$ $a^3$              |
+| **2**     | $2$             | $0$                | $a^4$       | $a^3$                              |
+| **3**     | $3$             | $1$                | $a^8$       | $a^3 \cdot a^8 =$ $a^{11}$         |
+| **4**     | $4$             | $1$                | $a^{16}$    | $a^{11} \cdot a^{16} =$ $a^{27}$   |
+| **5**     | $5$             | $0$                | $a^{32}$    | $a^{27}$                           |
+| **6**     | $6$             | $0$                | $a^{64}$    | $a^{27}$                           |
+| **7**     | $7$             | $0$                | $a^{128}$   | $a^{27}$                           |
+| **8**     | $8$             | $1$                | $a^{256}$   | $a^{27} \cdot a^{256} =$ $a^{283}$ |
 
----
-
-### **3.4.5 Searching & Sorting Algorithms**
-
-#### **1. Linear Search Complexity Summary**
-In Linear Search over an array of size \\(n\\), comparison is the key operation [31, 34]:
-
-| Case | Condition | Comparisons | Complexity |
-| :--- | :--- | :---: | :---: |
-| **Best Case** | Element found at first position (\\(A\\)) [35]. | \\(1\\) [35] | **\\(O(1)\\)** [35, 36] |
-| **Worst Case** | Element at last position (\\(A[n-1]\\)) or not present [35]. | \\(n\\) [35] | **\\(O(n)\\)** [35, 36] |
-| **Average Case** | Element found halfway into the list [35]. | \\(n/2\\) [35] | **\\(O(n)\\)** [35, 36] |
+- **Complexity Bound:** $s-1 \le \text{multiplications} \le 2(s-1) \implies \mathbf{O(\log_2 n)}$.
 
 ---
 
-#### **2. Bubble Sort Algorithm & Optimizations**
+**3.4.5 Searching & Sorting Algorithms**
 
-* **Version 1 (Basic Bubble Sort):**
-  Uses two nested loops, each iterating \\(n-1\\) times without checking if the array is already sorted [4, 37]:
-  \\[T(n) = (n-1)(n-1) \cdot C = C n^2 - 2Cn + C \implies \mathbf{O(n^2)}\\] [4, 37]
+**1. Linear Search Complexity**
 
-* **Version 2 & 3 (Flag-Optimized Bubble Sort):**
-  Adds a boolean swap flag (`swapped = false`). If a full inner pass completes without making any swaps, the algorithm halts early [4, 23].
-  * **Worst Case:** Reverse-sorted array \\(\implies \mathbf{O(n^2)}\\) [23, 38, 39].
-  * **Best Case:** Already-sorted array \\(\implies \mathbf{O(n)}\\) (the inner loop runs only 1 pass of \\(n-1\\) comparisons to verify order) [23, 38].
+Searches for an element sequentially in an unsorted array.
+
+| Case             | Condition                                | Comparisons | Time Complexity |
+| ---------------- | ---------------------------------------- | ----------- | --------------- |
+| **Best Case**    | Target found at 1st index $A$.           | $1$28       | $O(1)$          |
+| **Worst Case**   | Target at last index $A[n-1]$ or absent. | $n$28       | $O(n)$          |
+| **Average Case** | Target found halfway into array.         | $n/2$28     | $O(n)$          |
 
 ---
-````
+
+**2. Bubble Sort Versions & Optimizations**
+
+Compares and swaps adjacent elements if out of order, bubbling the largest unsorted element to the end in each pass.
+
+- **Version 1 (Basic Bubble Sort):** Executes $n-1$ outer passes and $n-1$ inner comparisons unconditionally. $$T(n) = (n-1)(n-1) \cdot C = C n^2 - 2Cn + C \implies \mathbf{O(n^2)}$$
+- **Version 3 (Flag-Optimized Bubble Sort):** Introduces boolean `flag = 0` before each inner pass; sets `flag = 1` if a swap occurs14. If no swaps occur (`flag == 0`), the array is sorted and the algorithm terminates immediately.
+    - **Worst Case:** Reverse-sorted array $\implies \mathbf{O(n^2)}$.
+    - **Best Case:** Already-sorted array $\implies \mathbf{O(n)}$ (requires only $1$ pass of $n-1$ comparisons).
