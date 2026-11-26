@@ -11,10 +11,14 @@
             "id": "9758b424f93e60d2",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "Complete A.I. & Machine Learning, Data Science Bootcamp/section 1 - introduction.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "section 1 - introduction"
             }
           }
         ]
@@ -95,6 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "Complete A.I. & Machine Learning, Data Science Bootcamp/section 1 - introduction.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -113,6 +118,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "Complete A.I. & Machine Learning, Data Science Bootcamp/section 1 - introduction.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -155,6 +161,7 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "Complete A.I. & Machine Learning, Data Science Bootcamp/section 1 - introduction.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -182,5 +189,13 @@
     }
   },
   "active": "9758b424f93e60d2",
-  "lastOpenFiles": []
+  "lastOpenFiles": [
+    "Complete A.I. & Machine Learning, Data Science Bootcamp/section 1 - introduction.md",
+    "Complete A.I. & Machine Learning, Data Science Bootcamp",
+    "MCA/SEM1/DISCRETE MATHS/BLOCK 1/Unit 2 Methods Of Proof.md",
+    "MCA/SEM1/DISCRETE MATHS/BLOCK 1/UNIT 1 PROPOSITIONAL CALCULUS.md",
+    "MCA/SEM1/DAA/BLOCK 1/unit-4.md",
+    "MCA/SEM1/DAA/BLOCK 1/unit-3.md",
+    "MCA/SEM1/DISCRETE MATHS/BLOCK 1/note.md"
+  ]
 }
